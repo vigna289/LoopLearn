@@ -36,11 +36,38 @@ class User(AbstractBaseUser, PermissionsMixin):
     otp_code = models.CharField(max_length=6, blank=True, null=True)
     otp_expiry = models.DateTimeField(blank=True, null=True)
     is_otp_verified = models.BooleanField(default=False)
-
+    
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name', 'phone_number']
+   # class User(AbstractBaseUser, PermissionsMixin):
+#     full_name = models.CharField(max_length=255)
+#     email = models.EmailField(unique=True)
+#     phone_number = models.CharField(max_length=15)
+#     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+
+#     # New fields for profile updates
+#     city = models.CharField(max_length=100, blank=True, null=True)
+#     state = models.CharField(max_length=100, blank=True, null=True)
+#     qualification = models.CharField(max_length=100, blank=True, null=True)
+#     year_of_experience = models.PositiveIntegerField(blank=True, null=True)
+#     skills = models.JSONField(default=list, blank=True)           # store array of skills
+#     desired_skills = models.JSONField(default=list, blank=True)
+#     certification1 = models.CharField(max_length=255, blank=True, null=True)
+#     certification2 = models.CharField(max_length=255, blank=True, null=True)
+
+#     is_active = models.BooleanField(default=True)
+#     is_staff = models.BooleanField(default=False)
+#     is_superuser = models.BooleanField(default=False)
+#     otp_code = models.CharField(max_length=6, blank=True, null=True)
+#     otp_expiry = models.DateTimeField(blank=True, null=True)
+#     is_otp_verified = models.BooleanField(default=False)
+
+#     objects = UserManager()
+
+#     USERNAME_FIELD = 'email'
+#     REQUIRED_FIELDS = ['full_name', 'phone_number']
 
     def __str__(self):
         return self.email

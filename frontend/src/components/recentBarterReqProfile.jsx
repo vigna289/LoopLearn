@@ -4,7 +4,7 @@ import { Container, Card, Button, Modal, Form } from "react-bootstrap";
 import CustomNavbar from "../shared/Navbar";
 import axios from "axios";
 
-const recentForumCards = () => {
+const recentBarterReqProfile = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile } = location.state || {};
@@ -31,6 +31,11 @@ console.log(profile);
       console.log("Logged-in user email:", parsedUser.email); // Log user email
     }
   }, [navigate]);
+useEffect(() => {
+  if (profile) {
+    console.log("Profile details:", profile);
+  }
+}, [profile]);
 
   useEffect(() => {
   const checkPendingRequest = async () => {
@@ -339,4 +344,4 @@ useEffect(() => {
   );
 };
 
-export default recentForumCards;
+export default recentBarterReqProfile;

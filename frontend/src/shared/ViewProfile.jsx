@@ -2,125 +2,41 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CustomNavbar from "../shared/Navbar";
-import { Button, FormControl, InputGroup, Form } from "react-bootstrap"; // Import Bootstrap components
+import { Button, FormControl, InputGroup, Form } from "react-bootstrap";
 
 const skillsOptions = [
-  "Accountant",
-  "Software Developer",
-  "Graphic Designer",
-  "Architect",
-  "Social Worker",
-  "Dentist",
-  "Real Estate Agent",
-  "Electrician",
-  "Plumber",
-  "Carpenter",
-  "Mechanic",
-  "Chef",
-  "Nurse",
-  "Teacher",
-  "Hairdresser",
-  "Gardener",
-  "Housekeeper/Maid",
-  "Barista",
-  "Painter",
-  "Truck Driver",
-  "Civil Engineer",
-  "Lawyer",
-  "Psychologist",
-  "Veterinarian",
-  "Fashion Designer",
-  "IT Support Specialist",
-  "Fitness Trainer",
-  "Translator",
-  "Event Planner",
-  "Interior Designer",
+  "Accountant", "Software Developer", "Graphic Designer", "Architect", "Social Worker",
+  "Dentist", "Real Estate Agent", "Electrician", "Plumber", "Carpenter",
+  "Mechanic", "Chef", "Nurse", "Teacher", "Hairdresser", "Gardener",
+  "Housekeeper/Maid", "Barista", "Painter", "Truck Driver", "Civil Engineer",
+  "Lawyer", "Psychologist", "Veterinarian", "Fashion Designer", "IT Support Specialist",
+  "Fitness Trainer", "Translator", "Event Planner", "Interior Designer",
 ];
 
 const statesOptions = [
-  "Andhra Pradesh",
-  "Arunachal Pradesh",
-  "Assam",
-  "Bihar",
-  "Chhattisgarh",
-  "Goa",
-  "Gujarat",
-  "Haryana",
-  "Himachal Pradesh",
-  "Jammu and Kashmir",
-  "Jharkhand",
-  "Karnataka",
-  "Kerala",
-  "Madhya Pradesh",
-  "Maharashtra",
-  "Manipur",
-  "Meghalaya",
-  "Mizoram",
-  "Nagaland",
-  "Odisha",
-  "Punjab",
-  "Rajasthan",
-  "Sikkim",
-  "Tamil Nadu",
-  "Telangana",
-  "Tripura",
-  "Uttar Pradesh",
-  "Uttarakhand",
-  "West Bengal",
-  "Andaman and Nicobar Islands",
-  "Chandigarh",
-  "Dadra and Nagar Haveli and Daman and Diu",
-  "Lakshadweep",
-  "Delhi",
-  "Puducherry",
+  "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat",
+  "Haryana","Himachal Pradesh","Jammu and Kashmir","Jharkhand","Karnataka","Kerala",
+  "Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha",
+  "Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh",
+  "Uttarakhand","West Bengal","Andaman and Nicobar Islands","Chandigarh",
+  "Dadra and Nagar Haveli and Daman and Diu","Lakshadweep","Delhi","Puducherry",
 ];
 
 const qualificationsOptions = [
-  "Bachelor of Engineering (BE)",
-  "Bachelor of Technology (BTech)",
-  "Master of Engineering (ME)",
-  "Master of Technology (MTech)",
-  "Bachelor of Science (BSc)",
-  "Master of Science (MSc)",
-  "Bachelor of Arts (BA)",
-  "Master of Arts (MA)",
-  "Bachelor of Commerce (BCom)",
-  "Master of Commerce (MCom)",
-  "Bachelor of Business Administration (BBA)",
-  "Master of Business Administration (MBA)",
-  "Bachelor of Computer Applications (BCA)",
-  "Master of Computer Applications (MCA)",
-  "Bachelor of Education (BEd)",
-  "Master of Education (MEd)",
-  "Bachelor of Fine Arts (BFA)",
-  "Master of Fine Arts (MFA)",
-  "Bachelor of Law (LLB)",
-  "Master of Law (LLM)",
-  "Bachelor of Pharmacy (BPharm)",
-  "Master of Pharmacy (MPharm)",
-  "Bachelor of Architecture (BArch)",
-  "Master of Architecture (MArch)",
-  "Bachelor of Dental Surgery (BDS)",
-  "Master of Dental Surgery (MDS)",
-  "Bachelor of Medicine, Bachelor of Surgery (MBBS)",
-  "Doctor of Medicine (MD)",
-  "Master of Surgery (MS)",
-  "Doctor of Philosophy (PhD)",
-  "Master of Philosophy (MPhil)",
-  "Bachelor of Social Work (BSW)",
-  "Master of Social Work (MSW)",
-  "Bachelor of Design (BDes)",
-  "Master of Design (MDes)",
-  "Bachelor of Hotel Management (BHM)",
-  "Master of Hotel Management (MHM)",
-  "Bachelor of Physical Education (BPEd)",
-  "Master of Physical Education (MPEd)",
-  "Bachelor of Veterinary Science (BVSc)",
-  "Master of Veterinary Science (MVSc)",
-  "Bachelor of Audiology and Speech-Language Pathology (BASLP)",
-  "Master of Audiology and Speech-Language Pathology (MASLP)",
-  "Bachelor of Physiotherapy (BPT)",
-  "Master of Physiotherapy (MPT)",
+  "Bachelor of Engineering (BE)","Bachelor of Technology (BTech)","Master of Engineering (ME)",
+  "Master of Technology (MTech)","Bachelor of Science (BSc)","Master of Science (MSc)",
+  "Bachelor of Arts (BA)","Master of Arts (MA)","Bachelor of Commerce (BCom)","Master of Commerce (MCom)",
+  "Bachelor of Business Administration (BBA)","Master of Business Administration (MBA)","Bachelor of Computer Applications (BCA)",
+  "Master of Computer Applications (MCA)","Bachelor of Education (BEd)","Master of Education (MEd)","Bachelor of Fine Arts (BFA)",
+  "Master of Fine Arts (MFA)","Bachelor of Law (LLB)","Master of Law (LLM)","Bachelor of Pharmacy (BPharm)",
+  "Master of Pharmacy (MPharm)","Bachelor of Architecture (BArch)","Master of Architecture (MArch)",
+  "Bachelor of Dental Surgery (BDS)","Master of Dental Surgery (MDS)","Bachelor of Medicine, Bachelor of Surgery (MBBS)",
+  "Doctor of Medicine (MD)","Master of Surgery (MS)","Doctor of Philosophy (PhD)","Master of Philosophy (MPhil)",
+  "Bachelor of Social Work (BSW)","Master of Social Work (MSW)","Bachelor of Design (BDes)","Master of Design (MDes)",
+  "Bachelor of Hotel Management (BHM)","Master of Hotel Management (MHM)","Bachelor of Physical Education (BPEd)",
+  "Master of Physical Education (MPEd)","Bachelor of Veterinary Science (BVSc)","Master of Veterinary Science (MVSc)",
+  "Bachelor of Audiology and Speech-Language Pathology (BASLP)","Master of Audiology and Speech-Language Pathology (MASLP)",
+  "Bachelor of Physiotherapy (BPT)","Master of Physiotherapy (MPT)",
 ];
 
 const ViewProfile = () => {
@@ -130,24 +46,28 @@ const ViewProfile = () => {
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
-
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const userData = JSON.parse(localStorage.getItem("user"));
+      const userData = JSON.parse(localStorage.getItem("userProfile"));
       if (!userData) {
         navigate("/login");
         return;
       }
 
-      try {
-        const response = await axios.get(`${API_URL}/api/users/`);
-        const matchedUser = response.data.find(
-          (u) => u.email === userData.email
-        );
-        setUser(matchedUser);
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
+      // Map localStorage data to proper select values
+      const mappedUser = {
+        ...userData,
+        state: userData.state ? { value: userData.state, label: userData.state } : null,
+        qualification: userData.qualification
+          ? { value: userData.qualification, label: userData.qualification }
+          : null,
+        skills: userData.skills ? userData.skills.map((s) => ({ value: s, label: s })) : [],
+        desired_skills: userData.desired_skills
+          ? userData.desired_skills.map((s) => ({ value: s, label: s }))
+          : [],
+      };
+
+      setUser(mappedUser);
     };
 
     fetchUserProfile();
@@ -155,52 +75,60 @@ const ViewProfile = () => {
 
   const handleEdit = (field) => {
     setEditableField(field);
-    setUpdatedValue(user[field] || "");
-  };
 
-  const handleUpdate = async () => {
-    console.log("User ID:", user.id);
-console.log("Updating field:", editableField, "with value:", updatedValue);
-
-    try {
-      let payload = {};
-if (editableField === "skills" || editableField === "desired_skills") {
-  payload[editableField] = [updatedValue]; // convert to array
-} else {
-  payload[editableField] = updatedValue;
-}
-
-await axios.patch(
-  `${API_URL}/api/users/${user.id}/`,
-  payload,
-  { headers: { "Content-Type": "application/json" } }
-);
-
-
-      setUser({ ...user, [editableField]: updatedValue });
-      setEditableField(null);
-    } catch (error) {
-      console.error("Error updating user profile:", error);
+    // Prefill edit value correctly
+    if (field === "skills" || field === "desired_skills") {
+      setUpdatedValue(user[field].length > 0 ? user[field][0].value : "");
+    } else if (field === "state" || field === "qualification") {
+      setUpdatedValue(user[field] ? user[field].value : "");
+    } else {
+      setUpdatedValue(user[field] || "");
     }
   };
 
-  if (!user) {
-    return <div>Loading...</div>;
-  }
+  const handleUpdate = async () => {
+    try {
+      let payload = {};
+      if (editableField === "skills" || editableField === "desired_skills") {
+        payload[editableField] = [updatedValue]; // array of strings
+      } else {
+        payload[editableField] = updatedValue;
+      }
 
-  // Fields to be displayed, excluding id, is_approved, profile_picture, and desired_skills
+      // Update local user state
+      const updatedUser = { ...user };
+      if (editableField === "skills" || editableField === "desired_skills") {
+        updatedUser[editableField] = [{ value: updatedValue, label: updatedValue }];
+      } else if (editableField === "state" || editableField === "qualification") {
+        updatedUser[editableField] = { value: updatedValue, label: updatedValue };
+      } else {
+        updatedUser[editableField] = updatedValue;
+      }
+
+      setUser(updatedUser);
+      setEditableField(null);
+
+      // Update API if needed
+      // await axios.patch(`${API_URL}/api/users/${user.id}/`, payload);
+    } catch (error) {
+      console.error("Error updating field:", error);
+    }
+  };
+
+  if (!user) return <div>Loading...</div>;
+
   const fieldsToDisplay = {
     full_name: "Full Name",
     email: "Email",
     phone_number: "Phone Number",
     city: "City",
-    state: "State", // State dropdown
-    qualification: "Qualification", // Qualification dropdown
+    state: "State",
+    qualification: "Qualification",
     year_of_experience: "Years of Experience",
-    skills: "Skills", // Skills dropdown
+    skills: "Skills",
     certification1: "Certification 1",
     certification2: "Certification 2",
-    desired_skills: "Desired Skills", // Desired Skills dropdown
+    desired_skills: "Desired Skills",
   };
 
   return (
@@ -223,15 +151,13 @@ await axios.patch(
                           onChange={(e) => setUpdatedValue(e.target.value)}
                         >
                           <option value="">Select a skill</option>
-                          {skillsOptions.map((skill, index) => (
-                            <option key={index} value={skill}>
-                              {skill}
+                          {skillsOptions.map((s, i) => (
+                            <option key={i} value={s}>
+                              {s}
                             </option>
                           ))}
                         </Form.Control>
-                        <Button variant="primary" onClick={handleUpdate}>
-                          Update
-                        </Button>
+                        <Button onClick={handleUpdate}>Update</Button>
                       </Form.Group>
                     ) : key === "state" ? (
                       <Form.Group>
@@ -241,15 +167,13 @@ await axios.patch(
                           onChange={(e) => setUpdatedValue(e.target.value)}
                         >
                           <option value="">Select a state</option>
-                          {statesOptions.map((state, index) => (
-                            <option key={index} value={state}>
-                              {state}
+                          {statesOptions.map((s, i) => (
+                            <option key={i} value={s}>
+                              {s}
                             </option>
                           ))}
                         </Form.Control>
-                        <Button variant="primary" onClick={handleUpdate}>
-                          Update
-                        </Button>
+                        <Button onClick={handleUpdate}>Update</Button>
                       </Form.Group>
                     ) : key === "qualification" ? (
                       <Form.Group>
@@ -259,15 +183,13 @@ await axios.patch(
                           onChange={(e) => setUpdatedValue(e.target.value)}
                         >
                           <option value="">Select a qualification</option>
-                          {qualificationsOptions.map((qualification, index) => (
-                            <option key={index} value={qualification}>
-                              {qualification}
+                          {qualificationsOptions.map((q, i) => (
+                            <option key={i} value={q}>
+                              {q}
                             </option>
                           ))}
                         </Form.Control>
-                        <Button variant="primary" onClick={handleUpdate}>
-                          Update
-                        </Button>
+                        <Button onClick={handleUpdate}>Update</Button>
                       </Form.Group>
                     ) : (
                       <InputGroup>
@@ -275,20 +197,20 @@ await axios.patch(
                           value={updatedValue}
                           onChange={(e) => setUpdatedValue(e.target.value)}
                         />
-                        <Button variant="primary" onClick={handleUpdate}>
-                          Update
-                        </Button>
+                        <Button onClick={handleUpdate}>Update</Button>
                       </InputGroup>
                     )
+                  ) : key === "skills" || key === "desired_skills" ? (
+                    user[key].map((s) => s.value).join(", ")
+                  ) : key === "state" || key === "qualification" ? (
+                    user[key] ? user[key].value : "N/A"
                   ) : (
                     user[key] || "N/A"
                   )}
                 </td>
                 <td>
                   {editableField !== key && (
-                    <Button variant="secondary" onClick={() => handleEdit(key)}>
-                      Edit
-                    </Button>
+                    <Button onClick={() => handleEdit(key)}>Edit</Button>
                   )}
                 </td>
               </tr>

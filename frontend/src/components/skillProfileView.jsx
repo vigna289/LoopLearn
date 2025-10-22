@@ -9,6 +9,10 @@ const SkillProfileView = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { searchType, searchTerm, profiles } = location.state || {};
+  console.log("🧩 Received profiles:", profiles);
+console.log("🔍 Search type:", searchType);
+console.log("🔍 Search term:", searchTerm);
+
   const [filteredProfiles, setFilteredProfiles] = useState(profiles);
   const [filterOptions, setFilterOptions] = useState([]);
   const [showNoProfilesModal, setShowNoProfilesModal] = useState(false);
@@ -20,23 +24,26 @@ const SkillProfileView = () => {
   }, [searchType, searchTerm, profiles]);
 
   const filterProfiles = (term, type) => {
+    if (!profiles || !Array.isArray(profiles)) {
+      setFilteredProfiles([]);
+      return;
+    }
+
     let filtered;
     if (type === "skill") {
       filtered = profiles.filter((profile) =>
         Array.isArray(profile.skills)
           ? profile.skills.includes(term)
-          : profile.skills.split(", ").includes(term)
+          : profile.skills?.split(", ").includes(term)
       );
     } else {
       filtered = profiles.filter((profile) => profile.state === term);
     }
     setFilteredProfiles(filtered);
-    if (filtered.length === 0) {
-      setShowNoProfilesModal(true);
-    } else {
-      updateFilterOptions(filtered, type);
-    }
+    if (filtered.length === 0) setShowNoProfilesModal(true);
+    else updateFilterOptions(filtered, type);
   };
+
 
   const updateFilterOptions = (profiles, type) => {
     let options;
@@ -126,11 +133,16 @@ const SkillProfileView = () => {
           </Dropdown>
         </div>
         <Row>
-          {filteredProfiles.map((profile) => (
-            <Col md={6} lg={4} key={profile.id} className="mb-4">
-              <CardComponent profile={profile} />
-            </Col>
-          ))}
+          {filteredProfiles && filteredProfiles.length > 0 ? (
+            filteredProfiles.map((profile) => (
+              <Col md={6} lg={4} key={profile.id}>
+                <CardComponent profile={profile} />
+              </Col>
+            ))
+          ) : (
+            <p className="text-center">No profiles available.</p>
+          )}
+
         </Row>
         <div className="text-center mt-4">
           <Button

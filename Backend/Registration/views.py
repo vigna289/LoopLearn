@@ -1,9 +1,40 @@
 from rest_framework import viewsets, status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .models import User
-from .serializers import UserSerializer
+from Registration.models import User
+from Registration.serializers import UserSerializer
 
+
+class UserSignupView(APIView):
+    def post(self, request):
+        # Use request.data for text fields and request.FILES for file uploads
+        data = request.data.copy()
+        files = request.FILES
+
+        # Add files to data if they exist
+        if 'certification1' in files:
+            data['certification1'] = files['certification1']
+        if 'certification2' in files:
+            data['certification2'] = files['certification2']
+        if 'profile_picture' in files:
+            data['profile_picture'] = files['profile_picture']
+
+        serializer = UserSerializer(data=data)
+        
+        if serializer.is_valid():
+            user = serializer.save()  # triggers post_save signal automatically
+            print("User saved:", user)  # debug print
+            return Response(
+                {"message": "Registration successful! Waiting for admin approval."},
+                status=status.HTTP_201_CREATED
+            )
+        
+        # If validation fails, return detailed errors
+        print("Serializer errors:", serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer

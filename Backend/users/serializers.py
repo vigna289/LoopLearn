@@ -7,7 +7,15 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'full_name', 'email', 'phone_number', 'profile_picture']
-
+# class UserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = [
+#             'id', 'full_name', 'email', 'phone_number', 'profile_picture',
+#             'city', 'state', 'qualification', 'year_of_experience',
+#             'skills', 'desired_skills', 'certification1', 'certification2'
+#         ]
+#         read_only_fields = ['email']
 class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     otp = serializers.CharField(write_only=True, required=False)

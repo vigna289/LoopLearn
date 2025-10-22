@@ -7,9 +7,9 @@ const CardComponent = ({ profile }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const [profilePicture, setProfilePicture] = useState("");
-  const defaultImage = "https://via.placeholder.com/150"; // Placeholder image URL
+  const defaultImage = "https://static.vecteezy.com/system/resources/previews/020/765/399/original/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg";
   const baseURL = `${API_URL}`; // Base URL for your API
-
+  console.log("profile",profile);
   useEffect(() => {
     const fetchProfilePicture = async () => {
       try {
@@ -29,17 +29,18 @@ const CardComponent = ({ profile }) => {
   }, [profile.email]);
 
   // Ensure that profile.skills is treated as an array
-  const skills = Array.isArray(profile.skills)
-    ? profile.skills
-    : typeof profile.skills === 'string'
-      ? profile.skills.split(", ")
-      : [];
+const skills = Array.isArray(profile.skills)
+  ? profile.skills
+  : typeof profile.skills === "string"
+    ? profile.skills.split(", ")
+    : [];
 
-  const desiredSkills = Array.isArray(profile.desired_skills)
-    ? profile.desired_skills
-    : typeof profile.desired_skills === 'string'
-      ? profile.desired_skills.split(", ")
-      : [];
+// Desired Skills
+const desiredSkills = Array.isArray(profile.desiredSkills)
+  ? profile.desiredSkills
+  : typeof profile.desiredSkills === "string"
+    ? profile.desiredSkills.split(", ")
+    : []; // ✅ fallback to empty array
 
   const handleViewProfile = () => {
     navigate("/full-profile-view", { state: { profile } });
@@ -74,14 +75,14 @@ const CardComponent = ({ profile }) => {
           {profile.full_name}
         </Card.Title>
         <Card.Text>
-          <strong>Location:</strong> {profile.city}, {profile.state}
+          <strong>Location:</strong> {profile.location},
         </Card.Text>
         <Card.Text>
           <strong>Skills:</strong> {skills.join(", ")}
         </Card.Text>
         <Card.Text>
-          <strong>Desired Skills:</strong> {desiredSkills.join(", ")}
-        </Card.Text>
+  <strong>Desired Skills:</strong> {desiredSkills.join(", ")}
+</Card.Text>
         <Card.Text>
           <strong>Qualification:</strong> {profile.qualification}
         </Card.Text>

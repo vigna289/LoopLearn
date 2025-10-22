@@ -25,10 +25,12 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       const loggedInUser = JSON.parse(localStorage.getItem("user"));
+      
 
       try {
-        const response = await axios.get(`${API_URL}/api/users/`);
+        const response = await axios.get(`${API_URL}/api/Registration/users/`);
         const data = response.data;
+        console.log("response",data)
 
         const skills = new Set();
         const states = new Set();
@@ -67,6 +69,7 @@ const Dashboard = () => {
 
             return {
               id: user.id,
+              full_name: user.full_name,
               name: user.full_name,
               location: `${user.city}, ${user.state}`,
               email: user.email,
@@ -74,6 +77,8 @@ const Dashboard = () => {
               desiredSkills: user.desired_skills
                 ? user.desired_skills.split(", ")
                 : [],
+               qualification: user.qualification || "N/A", // ✅ add this  
+               year_of_experience: user.year_of_experience || 0, // ✅ add this
               rating: averageScore.toFixed(2) || "N/A",
               img: profilePicture,
               message: `Looking to exchange ${user.skills} skills for ${user.desired_skills} knowledge.`,
@@ -118,12 +123,12 @@ const Dashboard = () => {
   // Handle selection changes
   const handleSkillChange = (e) => setSelectedSkill(e.target.value);
   const handleLocationChange = (e) => setSelectedLocation(e.target.value);
-
+ console.log(forumPostsList)
   // Handle search button clicks
   const handleSearchBySkill = () => {
     if (!selectedSkill) return;
     navigate("/skill-profile-view", {
-      state: { searchType: "skill", searchTerm: selectedSkill },
+      state: { searchType: "skill", searchTerm: selectedSkill ,profiles: forumPostsList    },
     });
   };
 

@@ -9,7 +9,7 @@ const FullProfileView = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile } = location.state || {};
-
+  console.log(profile)
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
@@ -197,7 +197,7 @@ const FullProfileView = () => {
                 {profile.full_name}
               </Card.Title>
               <Card.Text>
-                <strong>Location:</strong> {profile.city}, {profile.state}
+                <strong>Location:</strong> {profile.location}
               </Card.Text>
               <Card.Text>
                 <strong>Skills:</strong>{" "}
@@ -205,12 +205,13 @@ const FullProfileView = () => {
                   ? profile.skills.join(", ")
                   : profile.skills}
               </Card.Text>
-              <Card.Text>
-                <strong>Desired Skills:</strong>{" "}
-                {Array.isArray(profile.desired_skills)
-                  ? profile.desired_skills.join(", ")
-                  : profile.desired_skills}
-              </Card.Text>
+<Card.Text>
+  <strong>Desired Skills:</strong>{" "}
+  {Array.isArray(profile.desiredSkills)
+    ? profile.desiredSkills.join(", ")
+    : profile.desiredSkills || "N/A"}
+</Card.Text>
+
               <Card.Text>
                 <strong>Rating:</strong> {profile.rating}
               </Card.Text>
