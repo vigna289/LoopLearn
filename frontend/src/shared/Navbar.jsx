@@ -142,7 +142,7 @@ useEffect(() => {
           className="font-weight-bold"
           style={{ transition: "transform 0.3s ease" }}
         >
-          Skill<span style={{ color: "#F83002" }}>Barter</span>
+          Skill<span style={{ color: "#6A38C2" }}>Barter</span>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav">
           <FaBars />

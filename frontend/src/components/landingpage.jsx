@@ -31,11 +31,11 @@ function LandingPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/users/`);
+        const response = await axios.get(`${API_URL}/api/Registration/users/`);
         const formattedData = await Promise.all(
           response.data.map(async (user) => {
             const emailEncoded = user.email.replace("@", "%40");
-            let profilePicture = "https://via.placeholder.com/150";
+            let profilePicture = "https://static.vecteezy.com/system/resources/previews/020/765/399/non_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg";
 
             try {
               const profilePicResponse = await axios.get(
@@ -227,7 +227,7 @@ function LandingPage() {
             <ArrowForwardIcon />
           </button>
         </div>
-
+          
         <ForumCards forumPosts={forumPosts} />
       </div>
     </>

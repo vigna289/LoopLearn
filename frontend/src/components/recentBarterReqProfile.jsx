@@ -189,11 +189,16 @@ useEffect(() => {
               animation: "fadeIn 0.5s",
             }}
           >
-            <Card.Img
-              variant="top"
-              src={profile.img}
-              style={{ height: "300px", objectFit: "cover" }}
-            />
+           <Card.Img
+  variant="top"
+  src={profile.img}
+  style={{
+    height: "300px",
+    objectFit: "cover",
+    objectPosition: "center top", // 👈 keeps top part visible
+  }}
+/>
+
             <Card.Body style={{ textAlign: "left" }}>
               <Card.Title style={{ fontSize: "2rem", fontWeight: "bold" }}>
                 {profile.name}

@@ -14,7 +14,8 @@ const SkillsPage = () => {
   useEffect(() => {
   const fetchProfiles = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/users/`);
+      const response = await axios.get(`${API_URL}/api/Registration/users`);
+      console.log(response.data); // see what keys each user has
       const profilesWithPics = response.data.map((profile) => ({
         ...profile,
         profilePicture: profile.profilePicture
@@ -30,7 +31,7 @@ const SkillsPage = () => {
   fetchProfiles();
 }, []);
 
-
+  console.log("Profiles",profiles);
   const springProps = useSpring({
     to: { opacity: 1, transform: "scale(1)" },
     from: { opacity: 0, transform: "scale(0.5)" },
@@ -39,13 +40,17 @@ const SkillsPage = () => {
 
   const handleSkillClick = (skill) => {
     const skillProfiles = profiles.filter((profile) => {
-      if (Array.isArray(profile.skills)) {
-        return profile.skills.includes(skill);
-      } else if (profile.skills) {
-        return profile.skills.split(", ").includes(skill);
-      }
-      return false;
-    });
+  if (Array.isArray(profile.skills)) {
+    return profile.skills.some(
+      (s) => (typeof s === "string" ? s : s.value) === skill
+    );
+  } else if (profile.skills) {
+    // fallback if skills is a string
+    return profile.skills.split(", ").includes(skill);
+  }
+  return false;
+});
+
 
     if (skillProfiles.length > 0) {
       navigate("/skill-profile-view", {

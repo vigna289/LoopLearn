@@ -47,31 +47,60 @@ const ViewProfile = () => {
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      const userData = JSON.parse(localStorage.getItem("userProfile"));
-      if (!userData) {
-        navigate("/login");
+  const fetchUserProfile = async () => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (!userData) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      // Fetch all users
+      const response = await axios.get(`${API_URL}/api/Registration/users/`, {
+        headers: {
+          Authorization: `Token ${localStorage.getItem("token")}`,
+        },
+      });
+      console.log(response)
+      // Find the current user by ID
+      const fullProfile = response.data.find(u => u.email === userData.email);
+      if (!fullProfile) {
+        console.error("User not found in registration backend");
+        setUser(userData); // fallback to localStorage
         return;
       }
 
-      // Map localStorage data to proper select values
-      const mappedUser = {
-        ...userData,
-        state: userData.state ? { value: userData.state, label: userData.state } : null,
-        qualification: userData.qualification
-          ? { value: userData.qualification, label: userData.qualification }
-          : null,
-        skills: userData.skills ? userData.skills.map((s) => ({ value: s, label: s })) : [],
-        desired_skills: userData.desired_skills
-          ? userData.desired_skills.map((s) => ({ value: s, label: s }))
-          : [],
-      };
+      // Map backend data to proper select values
+const mappedUser = {
+  ...fullProfile,
+  state: fullProfile.state
+    ? { value: fullProfile.state, label: fullProfile.state }
+    : null,
+  qualification: fullProfile.qualification
+    ? { value: fullProfile.qualification, label: fullProfile.qualification }
+    : null,
+  skills: fullProfile.skills
+    ? Array.isArray(fullProfile.skills)
+      ? fullProfile.skills.map(s => (typeof s === "string" ? { value: s, label: s } : s))
+      : [{ value: fullProfile.skills, label: fullProfile.skills }]
+    : [],
+  desired_skills: fullProfile.desired_skills
+    ? Array.isArray(fullProfile.desired_skills)
+      ? fullProfile.desired_skills.map(s => (typeof s === "string" ? { value: s, label: s } : s))
+      : [{ value: fullProfile.desired_skills, label: fullProfile.desired_skills }]
+    : [],
+};
 
       setUser(mappedUser);
-    };
+    } catch (err) {
+      console.error("Failed to fetch full profile:", err);
+      setUser(userData); // fallback to localStorage
+    }
+  };
 
-    fetchUserProfile();
-  }, [navigate]);
+  fetchUserProfile();
+}, [navigate]);
+
 
   const handleEdit = (field) => {
     setEditableField(field);
@@ -201,12 +230,14 @@ const ViewProfile = () => {
                       </InputGroup>
                     )
                   ) : key === "skills" || key === "desired_skills" ? (
-                    user[key].map((s) => s.value).join(", ")
-                  ) : key === "state" || key === "qualification" ? (
-                    user[key] ? user[key].value : "N/A"
-                  ) : (
-                    user[key] || "N/A"
-                  )}
+    Array.isArray(user[key]) && user[key].length > 0
+      ? user[key].map((s) => s.value).join(", ")
+      : "N/A"
+  ) : key === "state" || key === "qualification" ? (
+    user[key]?.value || "N/A"
+  ) : (
+    user[key] || "N/A"
+  )}
                 </td>
                 <td>
                   {editableField !== key && (

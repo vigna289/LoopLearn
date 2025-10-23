@@ -24,6 +24,7 @@ const FullProfileView = () => {
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
+    console.log("USER",userData)
     if (!userData) {
       navigate("/login");
     } else {
@@ -197,7 +198,7 @@ const FullProfileView = () => {
                 {profile.full_name}
               </Card.Title>
               <Card.Text>
-                <strong>Location:</strong> {profile.location}
+                <strong>Location:</strong> {profile.state}
               </Card.Text>
               <Card.Text>
                 <strong>Skills:</strong>{" "}
@@ -207,9 +208,9 @@ const FullProfileView = () => {
               </Card.Text>
 <Card.Text>
   <strong>Desired Skills:</strong>{" "}
-  {Array.isArray(profile.desiredSkills)
-    ? profile.desiredSkills.join(", ")
-    : profile.desiredSkills || "N/A"}
+  {Array.isArray(profile.desired_skills)
+    ? profile.desired_skills.join(", ")
+    : profile.desired_skills || "N/A"}
 </Card.Text>
 
               <Card.Text>

@@ -44,4 +44,5 @@ export const qualifications = [
   "Master of Audiology and Speech-Language Pathology (MASLP)",
   "Bachelor of Physiotherapy (BPT)",
   "Master of Physiotherapy (MPT)",
+  "Cricketer"
 ];

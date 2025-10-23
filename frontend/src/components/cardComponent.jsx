@@ -48,20 +48,28 @@ const desiredSkills = Array.isArray(profile.desiredSkills)
 
   return (
     <Card
-      className="mx-auto"
-      style={{
-        width: "18rem",
-        borderRadius: "15px",
-        overflow: "hidden",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-      }}
-    >
-      <Card.Img
-        variant="top"
-        src={profilePicture || defaultImage}
-        alt={profile.full_name}
-        style={{ height: "150px", objectFit: "cover" }}
-      />
+  className="mx-auto"
+  style={{
+    width: "18rem",
+    borderRadius: "15px",
+    overflow: "hidden",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", // slightly stronger shadow
+  }}
+>
+  <Card.Img
+    variant="top"
+    src={profilePicture || defaultImage}
+    alt={profile.full_name}
+    style={{
+      width: "100%",           // full card width
+      height: "280px",         // increased height for more screen presence
+      objectFit: "cover",      // fills area, crops excess
+      objectPosition: "top",   // keeps top part visible
+      borderRadius: "15px 15px 0 0" // rounded only at top
+    }}
+  />
+
+
       <Card.Body style={{ textAlign: "left" }}>
         <Card.Title
           style={{
@@ -75,7 +83,7 @@ const desiredSkills = Array.isArray(profile.desiredSkills)
           {profile.full_name}
         </Card.Title>
         <Card.Text>
-          <strong>Location:</strong> {profile.location},
+          <strong>Location:</strong> {profile.state}
         </Card.Text>
         <Card.Text>
           <strong>Skills:</strong> {skills.join(", ")}

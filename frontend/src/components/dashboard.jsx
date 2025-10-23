@@ -21,26 +21,20 @@ const Dashboard = () => {
   const forumRef = useRef(null);
   const navigate = useNavigate();
 
-  // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
       const loggedInUser = JSON.parse(localStorage.getItem("user"));
-      
-
       try {
         const response = await axios.get(`${API_URL}/api/Registration/users/`);
         const data = response.data;
-        console.log("response",data)
-
-        const skills = new Set();
-        const states = new Set();
+        const skillsSet = new Set();
+        const statesSet = new Set();
 
         const formattedData = await Promise.all(
           data.map(async (user) => {
-            const emailEncoded = user.email.replace("@", "%40");
+            const emailEncoded = encodeURIComponent(user.email);
             const profilePictureURL = `${API_URL}/api/users/profile-picture/${emailEncoded}/`;
 
-            // Fetch profile picture with fallback default
             const profilePicture = await fetch(profilePictureURL)
               .then(async (res) => {
                 if (!res.ok) throw new Error("No profile picture found");
@@ -49,23 +43,16 @@ const Dashboard = () => {
                   ? `${API_URL}${data.profile_picture}`
                   : "https://tse4.mm.bing.net/th/id/OIP.Yaficbwe3N2MjD2Sg0J9OgHaHa?pid=Api&P=0&h=180";
               })
-              .catch((err) => {
-                console.error("Error fetching profile picture:", err);
-                return "https://tse4.mm.bing.net/th/id/OIP.Yaficbwe3N2MjD2Sg0J9OgHaHa?pid=Api&P=0&h=180";
-              });
+              .catch(() => "https://tse4.mm.bing.net/th/id/OIP.Yaficbwe3N2MjD2Sg0J9OgHaHa?pid=Api&P=0&h=180");
 
-            // Fetch scores
-            const scoreResponse = await axios.get(
-              `${API_URL}/api/friends/scores/${emailEncoded}/`
-            );
+            const scoreResponse = await axios.get(`${API_URL}/api/friends/scores/${emailEncoded}/`);
             const scores = scoreResponse.data.map((entry) => entry.score);
-            const averageScore =
-              scores.length > 0
-                ? scores.reduce((acc, score) => acc + score, 0) / scores.length
-                : 0;
+            const averageScore = scores.length > 0
+              ? scores.reduce((acc, score) => acc + score, 0) / scores.length
+              : 0;
 
-            skills.add(user.skills);
-            states.add(user.state);
+            skillsSet.add(user.skills);
+            statesSet.add(user.state);
 
             return {
               id: user.id,
@@ -74,11 +61,9 @@ const Dashboard = () => {
               location: `${user.city}, ${user.state}`,
               email: user.email,
               skills: user.skills ? user.skills.split(", ") : [],
-              desiredSkills: user.desired_skills
-                ? user.desired_skills.split(", ")
-                : [],
-               qualification: user.qualification || "N/A", // ✅ add this  
-               year_of_experience: user.year_of_experience || 0, // ✅ add this
+              desiredSkills: user.desired_skills ? user.desired_skills.split(", ") : [],
+              qualification: user.qualification || "N/A",
+              year_of_experience: user.year_of_experience || 0,
               rating: averageScore.toFixed(2) || "N/A",
               img: profilePicture,
               message: `Looking to exchange ${user.skills} skills for ${user.desired_skills} knowledge.`,
@@ -86,11 +71,9 @@ const Dashboard = () => {
           })
         );
 
-        setSkillsOptions([...skills]);
-        setStatesOptions([...states]);
-        setForumPostsList(
-          formattedData.filter((post) => post.id !== loggedInUser.id)
-        ); // Exclude logged-in user
+        setSkillsOptions([...skillsSet]);
+        setStatesOptions([...statesSet]);
+        setForumPostsList(formattedData.filter((post) => post.id !== loggedInUser.id));
       } catch (error) {
         console.error("Error fetching data", error);
       }
@@ -99,36 +82,25 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  // Toggle skill/location sections with smooth scroll
   const toggleSkills = () => {
     setShowSkills(!showSkills);
     setShowLocations(false);
-    if (!showSkills && skillsRef.current) {
-      setTimeout(() => {
-        skillsRef.current.scrollIntoView({ behavior: "smooth" });
-      }, 300);
-    }
+    if (!showSkills && skillsRef.current) setTimeout(() => skillsRef.current.scrollIntoView({ behavior: "smooth" }), 300);
   };
 
   const toggleLocations = () => {
     setShowLocations(!showLocations);
     setShowSkills(false);
-    if (!showLocations && locationsRef.current) {
-      setTimeout(() => {
-        locationsRef.current.scrollIntoView({ behavior: "smooth" });
-      }, 300);
-    }
+    if (!showLocations && locationsRef.current) setTimeout(() => locationsRef.current.scrollIntoView({ behavior: "smooth" }), 300);
   };
 
-  // Handle selection changes
   const handleSkillChange = (e) => setSelectedSkill(e.target.value);
   const handleLocationChange = (e) => setSelectedLocation(e.target.value);
- console.log(forumPostsList)
-  // Handle search button clicks
+
   const handleSearchBySkill = () => {
     if (!selectedSkill) return;
     navigate("/skill-profile-view", {
-      state: { searchType: "skill", searchTerm: selectedSkill ,profiles: forumPostsList    },
+      state: { searchType: "skill", searchTerm: selectedSkill, profiles: forumPostsList },
     });
   };
 
@@ -143,64 +115,133 @@ const Dashboard = () => {
     <>
       <CustomNavbar />
 
+      {/* Hero Section */}
       <div
-        className="d-flex justify-content-center align-items-center text-center"
         style={{
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          position: "relative",
           height: "60vh",
-          color: "black",
+          display: "flex",
           flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+          overflow: "hidden",
+          color: "white",
           padding: "20px",
+          background: "linear-gradient(135deg, #ffe6f0, #ffcce6, #ffb3d9)", // deeper and vibrant
+
+
         }}
       >
-        <h1 style={{ fontFamily: "Arial, sans-serif", fontWeight: "bold", marginBottom: 0 }}>
-          Welcome to
+        {/* Floating GIFs */}
+        {/* Floating GIFs */}
+<img
+  src="/images/lightbulb.gif"
+  alt="lightbulb"
+  style={{
+    position: "absolute",
+    top: "5%",
+    left: "5%",
+    width: "50px",
+    animation: "float1 5s ease-in-out infinite",
+  }}
+/>
+<img
+  src="/images/brain.gif"
+  alt="brain"
+  style={{
+    position: "absolute",
+    top: "10%",
+    right: "5%",
+    width: "55px",
+    animation: "float2 6s ease-in-out infinite",
+  }}
+/>
+<img
+  src="/images/handshake.gif"
+  alt="handshake"
+  style={{
+    position: "absolute",
+    bottom: "20%",
+    left: "10%",
+    width: "60px",
+    animation: "float3 7s ease-in-out infinite",
+  }}
+/>
+<img
+  src="/images/grad.gif"
+  alt="graduation"
+  style={{
+    position: "absolute",
+    bottom: "15%",
+    right: "15%",
+    width: "55px",
+    animation: "float4 5.5s ease-in-out infinite",
+  }}
+/>
+<img
+  src="/images/book.gif"
+  alt="book"
+  style={{
+    position: "absolute",
+    top: "30%",
+    left: "25%",
+    width: "50px",
+    animation: "float1 5s ease-in-out infinite",
+  }}
+/>
+<img
+  src="/images/laptop.gif"
+  alt="laptop"
+  style={{
+    position: "absolute",
+    top: "35%",
+    right: "30%",
+    width: "50px",
+    animation: "float2 6s ease-in-out infinite",
+  }}
+/>
+<img
+  src="/images/penn.gif"
+  alt="pen"
+  style={{
+    position: "absolute",
+    bottom: "35%",
+    left: "50%",
+    width: "45px",
+    animation: "float3 7s ease-in-out infinite",
+  }}
+/>
+
+
+        {/* Hero Text */}
+        <h1 style={{ fontWeight: "bold", marginBottom: 0, zIndex: 1 ,color:"#6A38C2"}}>Welcome to</h1>
+        <h1 style={{ fontWeight: "bold", marginTop: 0, zIndex: 1 }}>
+          <span style={{ color: "#6A38C2" }}>Skill</span>
+          <span style={{ color: "#343434" }}>Barter</span>
+          <span style={{ color: "#6A38C2" }}>.in</span>
         </h1>
-        <h1 style={{ fontFamily: "Arial, sans-serif", fontWeight: "bold", marginTop: 0 }}>
-          <span style={{ color: "black" }}>Skill</span>
-          <span style={{ color: "#F83002" }}>Barter</span>
-          <span style={{ color: "black" }}>.in</span>
-        </h1>
-        <p className="lead" style={{ fontFamily: "Arial, sans-serif", marginTop: 10 }}>
-          <span style={{ color: "#F83002" }}>India</span> ka apna skill barteting{" "}
-          <span style={{ color: "#F83002" }}>platform</span>
+        <p style={{ marginTop: 10, zIndex: 1 }}>
+          <span style={{ color: "#343434" }}>India</span> ka apna skill barteting{" "}
+          <span style={{ color: "#343434" }}>platform</span>
         </p>
 
-        <div className="mt-4 d-flex justify-content-center">
+        {/* Buttons */}
+        <div className="mt-4 d-flex justify-content-center" style={{ zIndex: 1 }}>
           <button
             className="btn mx-2"
-            style={{
-              backgroundColor: "#6A38C2",
-              color: "white",
-              border: "none",
-              padding: "10px 20px",
-              fontSize: "16px",
-              fontWeight: "bold",
-              borderRadius: "25px",
-              transition: "background-color 0.3s ease",
-            }}
+            style={{ backgroundColor: "#6A38C2", color: "white", border: "none", padding: "10px 20px", fontWeight: "bold", borderRadius: "25px" }}
             onClick={toggleSkills}
-            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#F83002")}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#343434")}
             onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#6A38C2")}
           >
             Search by Skill
           </button>
-
           <button
             className="btn mx-2"
-            style={{
-              backgroundColor: "#6A38C2",
-              color: "white",
-              border: "none",
-              padding: "10px 20px",
-              fontSize: "16px",
-              fontWeight: "bold",
-              borderRadius: "25px",
-              transition: "background-color 0.3s ease",
-            }}
+            style={{ backgroundColor: "#6A38C2", color: "white", border: "none", padding: "10px 20px", fontWeight: "bold", borderRadius: "25px" }}
             onClick={toggleLocations}
-            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#F83002")}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#343434")}
             onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#6A38C2")}
           >
             Search by Location
@@ -208,7 +249,16 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="container mt-5">
+      {/* Add CSS animations for GIFs */}
+      <style>{`
+        @keyframes float1 { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
+        @keyframes float2 { 0% { transform: translateY(0px); } 50% { transform: translateY(-25px); } 100% { transform: translateY(0px); } }
+        @keyframes float3 { 0% { transform: translateY(0px); } 50% { transform: translateY(-30px); } 100% { transform: translateY(0px); } }
+        @keyframes float4 { 0% { transform: translateY(0px); } 50% { transform: translateY(-22px); } 100% { transform: translateY(0px); } }
+      `}</style>
+
+      {/* Search Sections */}
+      <div className="container mt-5 p-4" style={{ borderRadius: "10px", background: "#f9f9f9" }}>
         {showSkills && (
           <div className="mt-4" ref={skillsRef}>
             <h2>Search by Skills</h2>
@@ -216,29 +266,12 @@ const Dashboard = () => {
             <form>
               <div className="form-group">
                 <label htmlFor="skillInput">Select Skill</label>
-                <select
-                  className="form-control"
-                  id="skillInput"
-                  value={selectedSkill}
-                  onChange={handleSkillChange}
-                  style={{ maxWidth: "100%", width: "100%" }}
-                >
-                  <option value="" disabled>
-                    Select a skill
-                  </option>
-                  {skillsOptions.map((skill, index) => (
-                    <option key={index} value={skill}>
-                      {skill}
-                    </option>
-                  ))}
+                <select className="form-control" id="skillInput" value={selectedSkill} onChange={handleSkillChange}>
+                  <option value="" disabled>Select a skill</option>
+                  {skillsOptions.map((skill, index) => (<option key={index} value={skill}>{skill}</option>))}
                 </select>
               </div>
-              <button
-                type="button"
-                className="btn btn-primary mt-2 w-100"
-                onClick={handleSearchBySkill}
-                disabled={!selectedSkill}
-              >
+              <button type="button" className="btn btn-primary mt-2 w-100" onClick={handleSearchBySkill} disabled={!selectedSkill}>
                 Search
               </button>
             </form>
@@ -252,29 +285,12 @@ const Dashboard = () => {
             <form>
               <div className="form-group">
                 <label htmlFor="locationInput">Select State</label>
-                <select
-                  className="form-control"
-                  id="locationInput"
-                  value={selectedLocation}
-                  onChange={handleLocationChange}
-                  style={{ maxWidth: "100%", width: "100%" }}
-                >
-                  <option value="" disabled>
-                    Select a state
-                  </option>
-                  {statesOptions.map((state, index) => (
-                    <option key={index} value={state}>
-                      {state}
-                    </option>
-                  ))}
+                <select className="form-control" id="locationInput" value={selectedLocation} onChange={handleLocationChange}>
+                  <option value="" disabled>Select a state</option>
+                  {statesOptions.map((state, index) => (<option key={index} value={state}>{state}</option>))}
                 </select>
               </div>
-              <button
-                type="button"
-                className="btn btn-primary mt-2 w-100"
-                onClick={handleSearchByLocation}
-                disabled={!selectedLocation}
-              >
+              <button type="button" className="btn btn-primary mt-2 w-100" onClick={handleSearchByLocation} disabled={!selectedLocation}>
                 Search
               </button>
             </form>
@@ -282,68 +298,8 @@ const Dashboard = () => {
         )}
       </div>
 
+      {/* Forum Cards */}
       <RecentForumCards forumPosts={forumPostsList} />
-
-      <div className="container mt-5" ref={forumRef}>
-        <div
-          className="mt-5"
-          style={{
-            maxHeight: "400px",
-            overflowY: "auto",
-            paddingRight: "15px",
-            marginTop: "20px",
-            margin: "auto",
-            transition: "max-height 0.3s ease",
-            borderRadius: "10px",
-            maxWidth: "800px",
-          }}
-        >
-          <h3 className="text-center mb-4">All Forum Posts</h3>
-          {forumPostsList.length === 0 ? (
-            <p className="text-center">No posts yet. Be the first to post!</p>
-          ) : (
-            <ul className="list-group">
-              {forumPostsList.map((post, index) => (
-                <li
-                  key={index}
-                  className="list-group-item"
-                  style={{
-                    marginBottom: "15px",
-                    padding: "20px",
-                    transition: "transform 0.3s ease",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() =>
-                    navigate("/recent-barter-profile-view", { state: { profile: post } })
-                  }
-                  onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
-                  onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                >
-                  <div className="d-flex align-items-center">
-                    <img
-                      src={post.img}
-                      alt="Profile"
-                      className="rounded-circle mr-3"
-                      style={{ width: "50px", height: "50px", objectFit: "cover", marginRight: "15px" }}
-                    />
-                    <div>
-                      <h5>{post.name}</h5>
-                      <p>{post.message}</p>
-                      <p>
-                        <strong>Desired Skills:</strong> {post.desiredSkills.join(", ")}
-                      </p>
-                      <p>
-                        <strong>Rating:</strong> {post.rating}
-                      </p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
     </>
   );
 };

@@ -9,6 +9,7 @@ const LocationProfileView = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { searchType, searchTerm, profiles = [] } = location.state || {};  // Default profiles to an empty array if undefined
+  console.log(searchTerm)
   const [filteredProfiles, setFilteredProfiles] = useState(profiles);
   const [filterOptions, setFilterOptions] = useState([]);
 
@@ -21,6 +22,7 @@ const LocationProfileView = () => {
 
   const filterProfiles = (term, type) => {
     let filtered;
+    
     if (type === "skill") {
       filtered = profiles.filter((profile) =>
         Array.isArray(profile.skills)

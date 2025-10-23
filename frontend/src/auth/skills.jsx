@@ -29,5 +29,7 @@ export const skillsOptions = [
   "Translator",
   "Event Planner",
   "Interior Designer",
+  "BatsMen",
+  "Bowler"
   // Add more skills if needed
 ];

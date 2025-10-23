@@ -49,11 +49,13 @@ class UserCreateView(generics.CreateAPIView):
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-class UserLoginView(APIView):
+# class UserLoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         email = request.data.get('email')
+        password = request.data.get('password')
+
 
         print("🟢 Email received from frontend:", email)
 
@@ -70,6 +72,27 @@ class UserLoginView(APIView):
         except User.DoesNotExist:
             print("❌ No user found for:", email)
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+class UserLoginView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')  # ✅ Correct indentation
+
+        print("📩 Received:", email, password)
+
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({
+                'token': token.key,
+                'user': UserSerializer(user).data
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {'error': 'Invalid email or password'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
 
 

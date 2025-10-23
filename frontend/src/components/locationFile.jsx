@@ -24,7 +24,8 @@ const LocationFile = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/users/`);
+        const response = await axios.get(`${API_URL}/api/Registration/users`);
+        console.log("...",response)
         const data = response.data;
 
         const uniqueLocations = new Set(data.map((user) => user.state));
@@ -36,12 +37,12 @@ const LocationFile = () => {
 
     fetchLocations();
   }, []);
-
+  
   const handleStateClick = async (state) => {
     if (locations.includes(state)) {
       try {
         const response = await axios.get(
-          `${API_URL}/api/users/?state=${encodeURIComponent(state)}`
+          `${API_URL}/api/Registration/users/?state=${encodeURIComponent(state)}`
         );
         const data = response.data.map((user) => ({
           ...user,

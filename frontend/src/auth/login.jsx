@@ -83,7 +83,7 @@ function Login() {
           password: password,
         }
       );
-
+      console.log("abc",response)
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
@@ -234,17 +234,17 @@ function Login() {
                 Email
               </label>
               <input
-                type="email"
-                className={`form-control ${
-                  fieldErrors.email ? "is-invalid" : ""
-                }`}
-                id="email"
-                placeholder="Enter a valid Email Address"
-                autoComplete="off"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+  type="email"
+  className="form-control"
+  id="email"
+  name="email"
+  placeholder="Enter a valid Email Address"
+  autoComplete="email"
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+  required
+/>
+
               {fieldErrors.email && (
                 <div className="invalid-feedback">{fieldErrors.email}</div>
               )}
@@ -254,17 +254,17 @@ function Login() {
                 Password
               </label>
               <input
-                type="password"
-                className={`form-control ${
-                  fieldErrors.password ? "is-invalid" : ""
-                }`}
-                id="password"
-                placeholder="Enter a Strong Password"
-                autoComplete="off"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+  type="password"
+  className="form-control"
+  id="password"
+  name="password"
+  placeholder="Enter a Strong Password"
+  autoComplete="current-password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  required
+/>
+
               {fieldErrors.password && (
                 <div className="invalid-feedback">{fieldErrors.password}</div>
               )}

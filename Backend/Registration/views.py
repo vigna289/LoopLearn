@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from Registration.models import User
 from Registration.serializers import UserSerializer
+from rest_framework import generics
 
 
 class UserSignupView(APIView):
