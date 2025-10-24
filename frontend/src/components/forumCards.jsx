@@ -58,10 +58,15 @@ const ForumCards = ({ forumPosts = [] }) => {
               }}
             >
               <Card.Img
-                variant="top"
-                src={post.img || defaultImage}
-                style={{ height: "150px", objectFit: "cover" }}
-              />
+  variant="top"
+  src={post.img || defaultImage}
+  style={{
+    height: "250px",      // increase height for more screen presence
+    objectFit: "contain", // ensures entire image fits
+    backgroundColor: "#f0f0f0", // optional: placeholder background
+  }}
+/>
+
               <Card.Body style={{ textAlign: "left" }}>
                 <Card.Title
                   style={{
