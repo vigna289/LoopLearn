@@ -143,8 +143,8 @@ const handleSubmit = async (event) => {
     formData.desiredSkills.map((skill) => skill.value).join(", ")
   );
 
-  if (selectedFile1) data.append("certification_1", selectedFile1);
-  if (selectedFile2) data.append("certification_2", selectedFile2);
+  if (selectedFile1) data.append("certification1", selectedFile1);
+  if (selectedFile2) data.append("certification2", selectedFile2);
 
   try {
     setLoading(true);

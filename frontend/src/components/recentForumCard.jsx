@@ -61,10 +61,19 @@ const recentForumCards = ({ forumPosts = [] }) => {
               }}
             >
               <Card.Img
-                variant="top"
-                src={post.img || defaultImage}
-                style={{ height: "150px", objectFit: "cover" }}
-              />
+  variant="top"
+  src={post.img || defaultImage}
+  style={{
+    height: "220px",            // increased height for bigger visual
+    width: "100%",
+    objectFit: "contain",       // show full image
+    objectPosition: "top",      // keep head visible
+    backgroundColor: "#f8f9fa", // soft background for empty space
+    padding: "5px",             // optional, gives a neat frame
+    borderRadius: "10px",       // subtle rounded corners
+  }}
+/>
+
               <Card.Body style={{ textAlign: "left" }}>
                 <Card.Title
                   style={{

@@ -36,10 +36,10 @@ const skills = Array.isArray(profile.skills)
     : [];
 
 // Desired Skills
-const desiredSkills = Array.isArray(profile.desiredSkills)
-  ? profile.desiredSkills
-  : typeof profile.desiredSkills === "string"
-    ? profile.desiredSkills.split(", ")
+const desiredSkills = Array.isArray(profile.desired_skills)
+  ? profile.desired_skills
+  : typeof profile.desired_skills === "string"
+    ? profile.desired_skills.split(", ")
     : []; // ✅ fallback to empty array
 
   const handleViewProfile = () => {
