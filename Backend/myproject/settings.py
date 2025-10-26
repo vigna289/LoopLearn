@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # 'Registration',
     'friends',
     'Registration',  # ✅ Add this
+    'chat',
     
 ]
 AUTH_USER_MODEL = 'users.User'

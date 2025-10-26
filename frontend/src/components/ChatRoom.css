@@ -1,0 +1,136 @@
+.chat-container {
+  max-width: 720px;
+  height: 80vh;
+}
+
+.chat-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.chat-header {
+  background: linear-gradient(90deg, #9983CF 0%, #E5B0DF 100%);
+  color: white;
+  font-size: 1.1rem;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chat-body {
+  flex: 1;
+  padding: 15px;
+  background: #f5f6fa;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message {
+  max-width: 65%;
+  position: relative;
+  padding: 10px 15px;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  word-wrap: break-word;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.sent {
+  margin-left: auto;
+  background: linear-gradient(135deg, #72a3de, hsl(196, 72%, 80%));
+  color: white;
+}
+
+.received {
+  margin-right: auto;
+  background: #fff;
+  color: #333;
+}
+
+.attachment-img {
+  max-width: 180px;
+  border-radius: 12px;
+  margin-bottom: 5px;
+}
+
+.timestamp {
+  font-size: 0.7rem;
+  color: #888;
+  text-align: right;
+  margin-top: 2px;
+}
+
+.chat-input {
+  background: #fff;
+  box-shadow: 0 -1px 4px rgba(0,0,0,0.1);
+}
+
+.btn-send {
+  background: linear-gradient(45deg, #6a11cb, #2575fc);
+  color: white;
+  border: none;
+  padding: 6px 20px;
+}
+
+.btn-send:hover {
+  opacity: 0.9;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity:1; transform: translateY(0);}
+}
+.chat-container {
+  max-width: 720px;
+  height: 80vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-background {
+  position: fixed;      /* Make it stay behind everything */
+  top: 0;
+  left: 0;
+  width: 100vw;         /* Full width of screen */
+  height: 100vh;        /* Full height of screen */
+  background: linear-gradient(270deg, #6a11cb, #2575fc, #42e695, #f3ffbd);
+  background-size: 800% 800%;
+  animation: gradientBG 15s ease infinite;
+  z-index: -1;          /* Stay behind everything */
+}
+
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Ensure chat card stays above the animation */
+.chat-card {
+  position: relative;
+  z-index: 1;
+}
+.moving-car {
+  position: fixed;       /* stays on screen */
+  bottom: 60px;          /* move it up (adjust as needed) */
+  left: -100px;          /* start outside left */
+  width: 80px;           /* adjust size */
+  z-index: 2;            /* above background */
+  animation: driveCar 10s linear infinite;
+}
+
+@keyframes driveCar {
+  0% {
+    left: -100px;       /* start offscreen */
+  }
+  100% {
+    left: 100vw;        /* move to right offscreen */
+  }
+}
+
+

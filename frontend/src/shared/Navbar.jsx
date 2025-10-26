@@ -183,6 +183,10 @@ useEffect(() => {
                 >
                   Friend Requests
                 </Nav.Link>
+                <Nav.Link as={Link} to="/chat" className="font-weight-bold">
+      Chat
+    </Nav.Link>
+
                 <Dropdown align="end" className="mr-lg-3 mb-2 mb-lg-0">
                   <Dropdown.Toggle
                     as={Button}

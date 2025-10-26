@@ -12,6 +12,7 @@ import {
 } from "react-bootstrap";
 import CustomNavbar from "../shared/Navbar";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const FriendRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -21,9 +22,10 @@ const FriendRequests = () => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState(""); // Assuming you have a comment field
+  const [comment, setComment] = useState(""); 
   const [userDetails, setUserDetails] = useState({});
   const API_URL = import.meta.env.VITE_API_URL;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -47,6 +49,7 @@ const FriendRequests = () => {
               detailsMap[email] = {
                 full_name: user.full_name,
                 phone_number: user.phone_number,
+                id: user.id,
               };
             }
           });
@@ -108,8 +111,8 @@ const FriendRequests = () => {
 
   const handleRatingSubmit = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
-    const rater_email = user ? user.email : null; // The logged-in user is the rater
-    const ratee_email = selectedRequest.sender_email; // The sender of the request is the ratee
+    const rater_email = user ? user.email : null; 
+    const ratee_email = selectedRequest.sender_email;
 
     if (!rater_email || !ratee_email) {
       setAlertMessage("Failed to submit rating. Missing rater or ratee email.");
@@ -117,27 +120,18 @@ const FriendRequests = () => {
       return;
     }
 
-    // Log the payload to ensure correctness
-    console.log({
-      rater_email,
-      ratee_email,
-      score: parseInt(rating, 10), // Ensure rating is an integer
-      comment, // Ensure comment is included if required
-    });
-
     try {
       const response = await axios.post(`${API_URL}/api/friends/rate-user/`, {
-        rater_email, // The logged-in user is giving the rating
-        ratee_email, // The person who sent the request is being rated
+        rater_email,
+        ratee_email,
         score: parseInt(rating, 10),
-        comment: comment, // Assuming you have a 'comment' state for the comment input
+        comment: comment,
       });
 
       if (response.data.success) {
         setAlertMessage("Rating submitted successfully!");
         setAlertVariant("success");
 
-        // Update the state to mark this request as rated
         setRequests((prevRequests) =>
           prevRequests.map((request) =>
             request.id === selectedRequest.id
@@ -153,18 +147,10 @@ const FriendRequests = () => {
       }
     } catch (error) {
       console.error("Error submitting rating", error);
-
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-        setAlertMessage(
-          error.response.data.error ||
-            "Failed to submit rating. Check network connectivity or try again later."
-        );
-      } else {
-        setAlertMessage(
+      setAlertMessage(
+        error.response?.data?.error ||
           "Failed to submit rating. Check network connectivity or try again later."
-        );
-      }
+      );
       setAlertVariant("danger");
     } finally {
       setShowRatingModal(false);
@@ -185,6 +171,7 @@ const FriendRequests = () => {
         >
           Friend Requests
         </h2>
+
         {alertMessage && (
           <Alert
             variant={alertVariant}
@@ -200,6 +187,7 @@ const FriendRequests = () => {
             {alertMessage}
           </Alert>
         )}
+
         {requests.length === 0 ? (
           <p
             className="text-center"
@@ -240,50 +228,24 @@ const FriendRequests = () => {
                     >
                       {request.message}
                     </Card.Text>
-                    <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center">
+
+                    <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
                       <Badge
                         pill
-                        bg={
-                          request.status === "accepted" ? "success" : "warning"
-                        }
+                        bg={request.status === "accepted" ? "success" : "warning"}
                         style={{
                           fontSize: "calc(0.8rem + 0.2vw)",
                           padding: "10px 20px",
-                          marginBottom: "1rem",
-                          marginRight: "0",
                         }}
                       >
                         {request.status === "accepted" ? "Accepted" : "Pending"}
                       </Badge>
-                      {request.status !== "accepted" ? (
-                        <Button
-                          variant="primary"
-                          onClick={() =>
-                            handleAcceptRequest(
-                              request.id,
-                              request.receiver_email
-                            )
-                          }
-                          className="mb-2 mb-sm-0"
-                          style={{
-                            backgroundColor: "#F83002",
-                            border: "none",
-                            borderRadius: "30px",
-                            padding: "10px 20px",
-                            fontWeight: "bold",
-                            color: "white",
-                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                            fontSize: "calc(0.9rem + 0.2vw)",
-                          }}
-                        >
-                          Accept Request
-                        </Button>
-                      ) : (
-                        <div className="d-flex flex-column flex-sm-row justify-content-end">
+
+                      {request.status === "accepted" ? (
+                        <div className="d-flex flex-column flex-sm-row justify-content-end gap-2">
                           <Button
                             variant="info"
                             onClick={() => handleShowPhone(request)}
-                            className="mb-2 mb-sm-0"
                             style={{
                               backgroundColor: "#6A38C2",
                               border: "none",
@@ -293,11 +255,11 @@ const FriendRequests = () => {
                               color: "white",
                               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                               fontSize: "calc(0.9rem + 0.2vw)",
-                              marginRight: "10px",
                             }}
                           >
                             Show Phone Number
                           </Button>
+
                           {!request.rated && (
                             <Button
                               variant="primary"
@@ -316,7 +278,45 @@ const FriendRequests = () => {
                               Give Rating
                             </Button>
                           )}
+
+                          <Button
+                            variant="success"
+                            onClick={() =>
+                              navigate(`/chat/${userDetails[request.sender_email]?.id}`)
+                            }
+                            style={{
+                              backgroundColor: "#28a745",
+                              border: "none",
+                              borderRadius: "30px",
+                              padding: "10px 20px",
+                              fontWeight: "bold",
+                              color: "white",
+                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                              fontSize: "calc(0.9rem + 0.2vw)",
+                            }}
+                          >
+                            Chat
+                          </Button>
                         </div>
+                      ) : (
+                        <Button
+                          variant="primary"
+                          onClick={() =>
+                            handleAcceptRequest(request.id, request.receiver_email)
+                          }
+                          style={{
+                            backgroundColor: "#F83002",
+                            border: "none",
+                            borderRadius: "30px",
+                            padding: "10px 20px",
+                            fontWeight: "bold",
+                            color: "white",
+                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                            fontSize: "calc(0.9rem + 0.2vw)",
+                          }}
+                        >
+                          Accept Request
+                        </Button>
                       )}
                     </div>
                   </Card.Body>
@@ -327,16 +327,10 @@ const FriendRequests = () => {
         )}
       </Container>
 
-      {/* Phone Number Modal */}
-      <Modal
-        show={showPhoneModal}
-        onHide={() => setShowPhoneModal(false)}
-        centered
-      >
+      {/* Phone Modal */}
+      <Modal show={showPhoneModal} onHide={() => setShowPhoneModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title style={{ fontSize: "calc(1.2rem + 0.2vw)" }}>
-            Phone Number
-          </Modal.Title>
+          <Modal.Title style={{ fontSize: "calc(1.2rem + 0.2vw)" }}>Phone Number</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {selectedRequest && (
@@ -345,9 +339,7 @@ const FriendRequests = () => {
               {userDetails[selectedRequest.sender_email]?.full_name ||
                 selectedRequest.sender_email}{" "}
               is:{" "}
-              <strong>
-                {userDetails[selectedRequest.sender_email]?.phone_number}
-              </strong>
+              <strong>{userDetails[selectedRequest.sender_email]?.phone_number}</strong>
             </p>
           )}
         </Modal.Body>
@@ -369,26 +361,14 @@ const FriendRequests = () => {
       </Modal>
 
       {/* Rating Modal */}
-      <Modal
-        show={showRatingModal}
-        onHide={() => setShowRatingModal(false)}
-        centered
-      >
+      <Modal show={showRatingModal} onHide={() => setShowRatingModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title style={{ fontSize: "calc(1.2rem + 0.2vw)" }}>
-            Give Rating
-          </Modal.Title>
+          <Modal.Title style={{ fontSize: "calc(1.2rem + 0.2vw)" }}>Give Rating</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group controlId="rating">
-              <Form.Label
-                style={{
-                  fontWeight: "bold",
-                  color: "#6A38C2",
-                  fontSize: "calc(1rem + 0.2vw)",
-                }}
-              >
+              <Form.Label style={{ fontWeight: "bold", color: "#6A38C2", fontSize: "calc(1rem + 0.2vw)" }}>
                 Rating
               </Form.Label>
               <Form.Control
@@ -397,21 +377,11 @@ const FriendRequests = () => {
                 onChange={(e) => setRating(e.target.value)}
                 min="1"
                 max="5"
-                style={{
-                  borderRadius: "10px",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                  fontSize: "calc(1rem + 0.2vw)",
-                }}
+                style={{ borderRadius: "10px", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", fontSize: "calc(1rem + 0.2vw)" }}
               />
             </Form.Group>
             <Form.Group controlId="comment" className="mt-3">
-              <Form.Label
-                style={{
-                  fontWeight: "bold",
-                  color: "#6A38C2",
-                  fontSize: "calc(1rem + 0.2vw)",
-                }}
-              >
+              <Form.Label style={{ fontWeight: "bold", color: "#6A38C2", fontSize: "calc(1rem + 0.2vw)" }}>
                 Comment
               </Form.Label>
               <Form.Control
@@ -419,11 +389,7 @@ const FriendRequests = () => {
                 rows={3}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                style={{
-                  borderRadius: "10px",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                  fontSize: "calc(1rem + 0.2vw)",
-                }}
+                style={{ borderRadius: "10px", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", fontSize: "calc(1rem + 0.2vw)" }}
               />
             </Form.Group>
           </Form>

@@ -22,7 +22,8 @@ import AlreadyLoggedIn from "./auth/alreadyLoggedIn";
 import skillProfileView from "./components/skillProfileView";
 import recentBarterReqProfile from "./components/recentBarterReqProfile";
 import AboutUs from "./shared/aboutUs";
-
+import ChatPage from "./components/ChatPage";
+import ChatRoom from "./components/ChatRoom";
 function App() {
   const isAuthenticated = !!localStorage.getItem("token");
 
@@ -97,6 +98,16 @@ function App() {
               path="/sent-requests"
               element={<LoginProtectedRoute element={SentRequests} />}
             />
+            <Route
+  path="/chat"
+  element={<LoginProtectedRoute element={ChatPage} />}
+/>
+
+<Route
+  path="/chat/:receiverId"
+  element={<LoginProtectedRoute element={ChatRoom} />}
+/>
+
             <Route
               path="/friend-requests"
               element={<LoginProtectedRoute element={FriendRequests} />}
