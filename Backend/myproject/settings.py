@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-715*-qahq-dhier0%%z(#a2ne%q0#09lp)q^40!@wdty509%z-
 DEBUG = True
 
 # ALLOWED_HOSTS = ["api.skillbarter.in", "www.api.skillbarter.in"]
-ALLOWED_HOSTS=['*']
+ALLOWED_HOSTS = ['looplearn-10.onrender.com', '127.0.0.1', 'localhost']
+
 
 
 # Application definition
@@ -148,15 +149,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Add your frontend URL here
-    # Add other allowed origins as needed
-    # "http://www.skillbarter.in",
-    # "http://skillbarter.in",
-    # "https://www.skillbarter.in",
-    # "https://skillbarter.in"
-
-
+    "http://localhost:5173",
+    "https://looplearn-10.onrender.com",
 ]
+
+
 
 
 REST_FRAMEWORK = {
@@ -201,3 +198,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 
+# Static files settings
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# WhiteNoise setup
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
