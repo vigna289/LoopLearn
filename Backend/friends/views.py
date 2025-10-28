@@ -94,15 +94,24 @@ def rate_user(request):
     score = request.data.get('score')
     comment = request.data.get('comment', '')
 
+    if not all([rater_email, ratee_email, score]):
+        return Response({'error': 'Missing fields'}, status=400)
+
     try:
         rater = User.objects.get(email=rater_email)
         ratee = User.objects.get(email=ratee_email)
     except User.DoesNotExist:
-        return Response({'error': 'User does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'User does not exist'}, status=400)
 
-    rating = Rating(rater=rater, ratee=ratee, score=score, comment=comment)
-    rating.save()
-    return Response({'success': 'Rating submitted'}, status=status.HTTP_201_CREATED)
+    # Ensure score is an integer
+    try:
+        score = int(score)
+    except ValueError:
+        return Response({'error': 'Score must be an integer'}, status=400)
+
+    rating = Rating.objects.create(rater=rater, ratee=ratee, score=score, comment=comment)
+    return Response({'success': 'Rating submitted'}, status=201)
+
 
 @api_view(['GET'])
 def list_ratings(request, user_id):

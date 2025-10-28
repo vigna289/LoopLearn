@@ -372,13 +372,19 @@ const FriendRequests = () => {
                 Rating
               </Form.Label>
               <Form.Control
-                type="number"
-                value={rating}
-                onChange={(e) => setRating(e.target.value)}
-                min="1"
-                max="5"
-                style={{ borderRadius: "10px", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", fontSize: "calc(1rem + 0.2vw)" }}
-              />
+  as="select"
+  value={rating}
+  onChange={(e) => setRating(e.target.value)}
+  style={{ borderRadius: "10px", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", fontSize: "calc(1rem + 0.2vw)" }}
+>
+  <option value="">Select rating</option>
+  {[...Array(10)].map((_, i) => (
+    <option key={i + 1} value={i + 1}>
+      {i + 1}
+    </option>
+  ))}
+</Form.Control>
+
             </Form.Group>
             <Form.Group controlId="comment" className="mt-3">
               <Form.Label style={{ fontWeight: "bold", color: "#6A38C2", fontSize: "calc(1rem + 0.2vw)" }}>

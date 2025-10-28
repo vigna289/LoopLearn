@@ -4,9 +4,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import CustomNavbar from "../shared/Navbar";
 import { Modal, Button, Alert, Spinner } from "react-bootstrap";
+import MinionMotion from "../components/MinionMotion";
+import FallingMinions from "../components/FallingMinions"; // 💛 new import
 
 function Login() {
   const [email, setEmail] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -22,6 +25,7 @@ function Login() {
   const [resetModalError, setResetModalError] = useState("");
   const [otpModalError, setOtpModalError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showFalling, setShowFalling] = useState(false); // 🎉 animation state
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL;
@@ -34,12 +38,10 @@ function Login() {
       errors.email = "Email is required.";
       isValid = false;
     }
-
     if (!password) {
       errors.password = "Password is required.";
       isValid = false;
     }
-
     setFieldErrors(errors);
     return isValid;
   };
@@ -58,7 +60,7 @@ function Login() {
     if (!/[0-9]/.test(password)) {
       errors.push("Password must contain at least one number.");
     }
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) {
       errors.push("Password must contain at least one special character.");
     }
     return errors;
@@ -67,28 +69,25 @@ function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
     setLoading(true);
 
     try {
-      
+      const response = await axios.post(`${API_URL}/api/users/login/`, {
+        email: email,
+        password: password,
+      });
 
-      const response = await axios.post(
-        `${API_URL}/api/users/login/`,
-        {
-          email: email,
-          password: password,
-        }
-      );
-      console.log("abc",response)
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         setMessage("Login successful!");
-        navigate("/dashboard");
+
+        // 🎉 Show falling minions before navigating
+        setShowFalling(true);
+
+        // Delay navigation for 2 seconds
+        setTimeout(() => navigate("/dashboard"), 2000);
       }
     } catch (error) {
       if (error.response && error.response.data) {
@@ -118,23 +117,14 @@ function Login() {
 
   const handlePasswordResetRequest = async () => {
     setLoading(true);
-
     try {
-      const response = await axios.post(
-        `${API_URL}/api/users/password-reset/`,
-        {
-          email: resetEmail,
-        }
-      );
+      const response = await axios.post(`${API_URL}/api/users/password-reset/`, {
+        email: resetEmail,
+      });
       setAlertVariant("success");
       setAlertMessage(response.data.message);
       setShowAlert(true);
-
-      // Set a timeout to hide the alert after 20 seconds
-      setTimeout(() => {
-        setShowAlert(false);
-      }, 20000);
-
+      setTimeout(() => setShowAlert(false), 20000);
       setShowResetModal(false);
       setShowOtpModal(true);
     } catch (error) {
@@ -143,10 +133,6 @@ function Login() {
       } else {
         setResetModalError("Error during password reset request");
       }
-      console.error(
-        "Password reset error:",
-        error.response ? error.response.data : error.message
-      );
     } finally {
       setLoading(false);
     }
@@ -154,20 +140,17 @@ function Login() {
 
   const handlePasswordResetConfirm = async () => {
     setLoading(true);
-
     const passwordErrors = validatePassword(newPassword);
     if (passwordErrors.length > 0) {
       setOtpModalError(passwordErrors.join(" "));
       setLoading(false);
       return;
     }
-
     if (!otp) {
       setOtpModalError("OTP is required.");
       setLoading(false);
       return;
     }
-
     try {
       const response = await axios.post(
         `${API_URL}/api/users/password-reset-confirm/`,
@@ -187,10 +170,6 @@ function Login() {
       } else {
         setOtpModalError("Error during password reset confirmation");
       }
-      console.error(
-        "Password reset confirmation error:",
-        error.response ? error.response.data : error.message
-      );
     } finally {
       setLoading(false);
     }
@@ -209,6 +188,12 @@ function Login() {
           background: "linear-gradient(120deg, #fdfbfb, #ebedee)",
         }}
       >
+        {/* Left side - Minions */}
+        <div className="d-flex justify-content-end" style={{ marginRight: "-40px" }}>
+          <MinionMotion isTyping={isTyping} />
+        </div>
+
+        {/* Login Form */}
         <div
           className="card p-4 shadow-lg"
           style={{
@@ -216,6 +201,7 @@ function Login() {
             width: "100%",
             borderRadius: "15px",
             boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+            marginLeft: "-40px",
           }}
         >
           <h2 className="mb-4 text-center">Login</h2>
@@ -228,47 +214,38 @@ function Login() {
               {alertMessage}
             </Alert>
           )}
+
           <form onSubmit={handleSubmit}>
             <div className="form-group mb-3">
-              <label htmlFor="email" className="form-label">
-                Email
-              </label>
+              <label htmlFor="email" className="form-label">Email</label>
               <input
-  type="email"
-  className="form-control"
-  id="email"
-  name="email"
-  placeholder="Enter a valid Email Address"
-  autoComplete="email"
-  value={email}
-  onChange={(e) => setEmail(e.target.value)}
-  required
-/>
-
-              {fieldErrors.email && (
-                <div className="invalid-feedback">{fieldErrors.email}</div>
-              )}
+                type="email"
+                className="form-control"
+                id="email"
+                placeholder="Enter Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onFocus={() => setIsTyping(true)}
+                onBlur={() => setIsTyping(false)}
+                required
+              />
             </div>
+
             <div className="form-group mb-3">
-              <label htmlFor="password" className="form-label">
-                Password
-              </label>
+              <label htmlFor="password" className="form-label">Password</label>
               <input
-  type="password"
-  className="form-control"
-  id="password"
-  name="password"
-  placeholder="Enter a Strong Password"
-  autoComplete="current-password"
-  value={password}
-  onChange={(e) => setPassword(e.target.value)}
-  required
-/>
-
-              {fieldErrors.password && (
-                <div className="invalid-feedback">{fieldErrors.password}</div>
-              )}
+                type="password"
+                className="form-control"
+                id="password"
+                placeholder="Enter Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setIsTyping(true)}
+                onBlur={() => setIsTyping(false)}
+                required
+              />
             </div>
+
             <Button
               type="submit"
               className="w-100 btn btn-primary"
@@ -283,30 +260,22 @@ function Login() {
             >
               {loading ? (
                 <>
-                  <Spinner
-                    as="span"
-                    animation="border"
-                    size="sm"
-                    role="status"
-                    aria-hidden="true"
-                  />{" "}
-                  Logging in...
+                  <Spinner as="span" animation="border" size="sm" /> Logging in...
                 </>
               ) : (
                 "Login"
               )}
             </Button>
+
             {message && <p className="mt-3 text-center">{message}</p>}
+
             <div className="mt-3 text-center">
               <span>Don't have an account? </span>
-              <a
-                href="/signup"
-                className="text-primary"
-                style={{ textDecoration: "none", fontWeight: "bold" }}
-              >
+              <a href="/signup" className="text-primary" style={{ textDecoration: "none", fontWeight: "bold" }}>
                 Signup
               </a>
             </div>
+
             <div className="mt-3 text-center">
               <a
                 href="#"
@@ -321,39 +290,16 @@ function Login() {
         </div>
       </div>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Registration Required</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{message}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={() => navigate("/registration")}>
-            Go to Registration
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {/* 🎉 Falling Minions Animation */}
+      {showFalling && <FallingMinions count={120} />}
 
-      <Modal
-        show={showResetModal}
-        onHide={() => setShowResetModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Password Reset</Modal.Title>
-        </Modal.Header>
+      {/* Reset & OTP Modals (same as before) */}
+      <Modal show={showResetModal} onHide={() => setShowResetModal(false)} centered>
+        <Modal.Header closeButton><Modal.Title>Password Reset</Modal.Title></Modal.Header>
         <Modal.Body>
-          {resetModalError && (
-            <Alert variant="danger" className="mb-3">
-              {resetModalError}
-            </Alert>
-          )}
+          {resetModalError && <Alert variant="danger">{resetModalError}</Alert>}
           <div className="form-group">
-            <label htmlFor="resetEmail" className="form-label">
-              Enter your email to receive a password reset link:
-            </label>
+            <label htmlFor="resetEmail" className="form-label">Enter your email:</label>
             <input
               type="email"
               className="form-control"
@@ -365,64 +311,31 @@ function Login() {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowResetModal(false)}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handlePasswordResetRequest}
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />{" "}
-                Sending...
-              </>
-            ) : (
-              "Submit"
-            )}
+          <Button variant="secondary" onClick={() => setShowResetModal(false)}>Cancel</Button>
+          <Button variant="primary" onClick={handlePasswordResetRequest} disabled={loading}>
+            {loading ? <Spinner as="span" animation="border" size="sm" /> : "Submit"}
           </Button>
         </Modal.Footer>
       </Modal>
 
-      <Modal
-        show={showOtpModal}
-        onHide={() => setShowOtpModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Enter OTP</Modal.Title>
-        </Modal.Header>
+      <Modal show={showOtpModal} onHide={() => setShowOtpModal(false)} centered>
+        <Modal.Header closeButton><Modal.Title>Enter OTP</Modal.Title></Modal.Header>
         <Modal.Body>
-          {otpModalError && (
-            <Alert variant="danger" className="mb-3">
-              {otpModalError}
-            </Alert>
-          )}
+          {otpModalError && <Alert variant="danger">{otpModalError}</Alert>}
           <div className="form-group mb-3">
-            <label htmlFor="otp" className="form-label">
-              OTP
-            </label>
+            <label htmlFor="otp" className="form-label">OTP</label>
             <input
               type="text"
               className="form-control"
               id="otp"
-              placeholder="Enter the OTP you received"
+              placeholder="Enter OTP"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
               required
             />
           </div>
           <div className="form-group mb-3">
-            <label htmlFor="newPassword" className="form-label">
-              New Password
-            </label>
+            <label htmlFor="newPassword" className="form-label">New Password</label>
             <input
               type="password"
               className="form-control"
@@ -432,36 +345,12 @@ function Login() {
               onChange={(e) => setNewPassword(e.target.value)}
               required
             />
-            <small className="text-muted">
-              Password must be at least 8 characters long, contain at least one
-              uppercase letter, one lowercase letter, one number, and one
-              special character.
-            </small>
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowOtpModal(false)}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handlePasswordResetConfirm}
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />{" "}
-                Resetting...
-              </>
-            ) : (
-              "Reset Password"
-            )}
+          <Button variant="secondary" onClick={() => setShowOtpModal(false)}>Cancel</Button>
+          <Button variant="primary" onClick={handlePasswordResetConfirm} disabled={loading}>
+            {loading ? <Spinner as="span" animation="border" size="sm" /> : "Reset Password"}
           </Button>
         </Modal.Footer>
       </Modal>

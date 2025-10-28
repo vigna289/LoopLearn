@@ -1,4 +1,3 @@
-// src/shared/Navbar.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -9,7 +8,12 @@ import {
   Dropdown,
   Badge,
 } from "react-bootstrap";
-import { FaBars, FaBell, FaEnvelopeOpenText, FaUserPlus } from "react-icons/fa";
+import {
+  FaBars,
+  FaBell,
+  FaEnvelopeOpenText,
+  FaUserPlus,
+} from "react-icons/fa";
 import axios from "axios";
 
 const CustomNavbar = () => {
@@ -17,46 +21,49 @@ const CustomNavbar = () => {
   const [user, setUser] = useState(null);
   const [profilePicture, setProfilePicture] = useState("");
   const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0); // notifications
+  const [chatUnreadCount, setChatUnreadCount] = useState(0); // chat unread
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
+  // ✅ Check login and fetch user data
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        setIsLoggedIn(true);
+        setUser(parsedUser);
 
-useEffect(() => {
-  const checkLoginStatus = () => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setIsLoggedIn(true);
-      setUser(parsedUser);
+        const pictureUrl =
+          parsedUser.profile_picture && parsedUser.profile_picture !== ""
+            ? `${API_URL}${parsedUser.profile_picture}`
+            : "https://tse4.mm.bing.net/th/id/OIP.Yaficbwe3N2MjD2Sg0J9OgHaHa?pid=Api&P=0&h=180";
+        setProfilePicture(pictureUrl);
 
-      // Use provided image URL if profile_picture is missing or empty
-      const pictureUrl =
-        parsedUser.profile_picture && parsedUser.profile_picture !== ""
-          ? `${API_URL}${parsedUser.profile_picture}`
-          : "https://tse4.mm.bing.net/th/id/OIP.Yaficbwe3N2MjD2Sg0J9OgHaHa?pid=Api&P=0&h=180";
-      setProfilePicture(pictureUrl);
+        fetchNotifications(parsedUser.id);
+        fetchUnreadChatCount(); // ✅ fetch chat unread count
+      } else {
+        setIsLoggedIn(false);
+        setUser(null);
+        setProfilePicture(
+          "https://tse4.mm.bing.net/th/id/OIP.Yaficbwe3N2MjD2Sg0J9OgHaHa?pid=Api&P=0&h=180"
+        );
+      }
+    };
 
-      fetchNotifications(parsedUser.id);
-    } else {
-      setIsLoggedIn(false);
-      setUser(null);
-      setProfilePicture(
-        "https://tse4.mm.bing.net/th/id/OIP.Yaficbwe3N2MjD2Sg0J9OgHaHa?pid=Api&P=0&h=180"
-      );
-    }
-  };
+    checkLoginStatus();
 
-  checkLoginStatus();
+    window.addEventListener("focus", checkLoginStatus);
+    const interval = setInterval(fetchUnreadChatCount, 10000); // auto-refresh chat unread count
 
-  window.addEventListener("focus", checkLoginStatus);
+    return () => {
+      window.removeEventListener("focus", checkLoginStatus);
+      clearInterval(interval);
+    };
+  }, []);
 
-  return () => {
-    window.removeEventListener("focus", checkLoginStatus);
-  };
-}, []);
-
-
+  // ✅ Fetch notifications
   const fetchNotifications = async (userId) => {
     try {
       const response = await axios.get(
@@ -69,6 +76,22 @@ useEffect(() => {
     }
   };
 
+  // ✅ Fetch chat unread messages
+  const fetchUnreadChatCount = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await axios.get(`${API_URL}/chat/unread-count/`, {
+        headers: { Authorization: `Token ${token}` },
+      });
+      setChatUnreadCount(response.data.unread_count);
+    } catch (error) {
+      console.error("Error fetching chat unread count:", error);
+    }
+  };
+
+  // ✅ Mark notification as read
   const handleNotificationRead = async (notificationId) => {
     try {
       const response = await axios.patch(
@@ -93,19 +116,13 @@ useEffect(() => {
     setUnreadCount(0);
   };
 
+  // ✅ Sign out
   const handleSignOut = () => {
-    // Clear local storage
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-
-    // Reset states
     setIsLoggedIn(false);
     setUser(null);
-
-    // Redirect to the login page
     navigate("/login");
-
-    // Optional: Force a re-render or reload the page to clear any cached states
     window.location.reload();
   };
 
@@ -144,9 +161,11 @@ useEffect(() => {
         >
           Skill<span style={{ color: "#6A38C2" }}>Barter</span>
         </Navbar.Brand>
+
         <Navbar.Toggle aria-controls="basic-navbar-nav">
           <FaBars />
         </Navbar.Toggle>
+
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           <Nav className="align-items-center text-center text-lg-left">
             <Nav.Link
@@ -156,17 +175,21 @@ useEffect(() => {
             >
               {isLoggedIn ? "Dashboard" : "Home"}
             </Nav.Link>
+
             <Nav.Link as={Link} to="/skills" className="font-weight-bold">
               Skills
             </Nav.Link>
+
             <Nav.Link as={Link} to="/locations" className="font-weight-bold">
               Locations
             </Nav.Link>
+
             {!isLoggedIn && (
               <Nav.Link as={Link} to="/about-us" className="font-weight-bold">
                 About Us
               </Nav.Link>
             )}
+
             {isLoggedIn ? (
               <>
                 <Nav.Link
@@ -176,6 +199,7 @@ useEffect(() => {
                 >
                   Sent Requests
                 </Nav.Link>
+
                 <Nav.Link
                   as={Link}
                   to="/friend-requests"
@@ -183,10 +207,27 @@ useEffect(() => {
                 >
                   Friend Requests
                 </Nav.Link>
-                <Nav.Link as={Link} to="/chat" className="font-weight-bold">
-      Chat
-    </Nav.Link>
 
+                {/* ✅ Chat link with unread badge */}
+                <Nav.Link
+                  as={Link}
+                  to="/chat"
+                  className="font-weight-bold position-relative"
+                >
+                  Chat
+                  {chatUnreadCount > 0 && (
+                    <Badge
+                      bg="danger"
+                      pill
+                      className="position-absolute top-0 start-100 translate-middle rounded-pill"
+                      style={{ fontSize: "0.7rem" }}
+                    >
+                      {chatUnreadCount}
+                    </Badge>
+                  )}
+                </Nav.Link>
+
+                {/* ✅ Notifications dropdown */}
                 <Dropdown align="end" className="mr-lg-3 mb-2 mb-lg-0">
                   <Dropdown.Toggle
                     as={Button}
@@ -246,6 +287,8 @@ useEffect(() => {
                     )}
                   </Dropdown.Menu>
                 </Dropdown>
+
+                {/* ✅ Profile dropdown */}
                 <Dropdown align="end">
                   <Dropdown.Toggle
                     as={Nav.Link}

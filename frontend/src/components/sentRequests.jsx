@@ -37,6 +37,7 @@ const SentRequests = () => {
           acc[user.email] = {
             full_name: user.full_name,
             phone_number: user.phone_number,
+            id: user.id,
           };
           return acc;
         }, {});
@@ -70,8 +71,6 @@ const SentRequests = () => {
       });
       if (response.data.success) {
         alert("Rating submitted successfully!");
-
-        // Update the state to mark this request as rated
         setSentRequests((prevRequests) =>
           prevRequests.map((request) =>
             request.id === selectedRequest.id
@@ -105,7 +104,6 @@ const SentRequests = () => {
               fontWeight: "bold",
               color: "white",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              transition: "background-color 0.3s ease",
             }}
             onMouseOver={(e) =>
               (e.currentTarget.style.backgroundColor = "#F83002")
@@ -156,7 +154,8 @@ const SentRequests = () => {
                   >
                     {request.message}
                   </Card.Text>
-                  <div className="d-flex justify-content-between">
+
+                  <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
                     <Button
                       variant="info"
                       onClick={() => handleShowPhone(request)}
@@ -168,10 +167,12 @@ const SentRequests = () => {
                         fontWeight: "bold",
                         color: "white",
                         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                        fontSize: "calc(0.9rem + 0.2vw)",
                       }}
                     >
                       Show Phone Number
                     </Button>
+
                     {!request.rated && (
                       <Button
                         variant="primary"
@@ -184,9 +185,34 @@ const SentRequests = () => {
                           fontWeight: "bold",
                           color: "white",
                           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                          fontSize: "calc(0.9rem + 0.2vw)",
                         }}
                       >
                         Give Rating
+                      </Button>
+                    )}
+
+                    {/* ✅ Chat Button added below */}
+                    {request.status === "accepted" && (
+                      <Button
+                        variant="success"
+                        onClick={() =>
+                          navigate(
+                            `/chat/${usersMap[request.receiver_email]?.id}`
+                          )
+                        }
+                        style={{
+                          backgroundColor: "#28a745",
+                          border: "none",
+                          borderRadius: "30px",
+                          padding: "10px 20px",
+                          fontWeight: "bold",
+                          color: "white",
+                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                          fontSize: "calc(0.9rem + 0.2vw)",
+                        }}
+                      >
+                        Chat
                       </Button>
                     )}
                   </div>
@@ -197,12 +223,8 @@ const SentRequests = () => {
         </Row>
       </Container>
 
-      {/* Phone Number Modal */}
-      <Modal
-        show={showPhoneModal}
-        onHide={() => setShowPhoneModal(false)}
-        centered
-      >
+      {/* Phone Modal */}
+      <Modal show={showPhoneModal} onHide={() => setShowPhoneModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Phone Number</Modal.Title>
         </Modal.Header>
@@ -236,11 +258,7 @@ const SentRequests = () => {
       </Modal>
 
       {/* Rating Modal */}
-      <Modal
-        show={showRatingModal}
-        onHide={() => setShowRatingModal(false)}
-        centered
-      >
+      <Modal show={showRatingModal} onHide={() => setShowRatingModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Give Rating</Modal.Title>
         </Modal.Header>
@@ -255,7 +273,7 @@ const SentRequests = () => {
                 value={rating}
                 onChange={(e) => setRating(e.target.value)}
                 min="1"
-                max="5"
+                max="10"
                 style={{
                   borderRadius: "10px",
                   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",

@@ -17,18 +17,32 @@ const ChatPage = () => {
     setUser(storedUser);
   }, []);
 
-  const fetchPartners = async () => {
-    if (!user) return;
-    try {
-      const response = await axios.get(`${API_URL}/chat/messages/user_chats/`, {
+const fetchPartners = async () => {
+  if (!user) return;
+  try {
+    const [partnersRes, unreadRes] = await Promise.all([
+      axios.get(`${API_URL}/chat/messages/user_chats/`, {
         params: { user_id: user.id },
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      setPartners(response.data);
-    } catch (error) {
-      console.error("Error fetching chat partners:", error);
-    }
-  };
+      }),
+      axios.get(`${API_URL}/chat/messages/unread_count/`, {
+        params: { user_id: user.id },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      }),
+    ]);
+
+    const unreadCounts = unreadRes.data;
+    const updatedPartners = partnersRes.data.map((p) => ({
+      ...p,
+      unread_count: unreadCounts[p.id] || 0,
+    }));
+
+    setPartners(updatedPartners);
+  } catch (error) {
+    console.error("Error fetching chat partners:", error);
+  }
+};
+
 
   useEffect(() => {
     fetchPartners();

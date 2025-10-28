@@ -50,19 +50,27 @@ const ChatRoom = () => {
   };
 
   // Fetch messages
-  const fetchMessages = async () => {
-    if (!user) return;
-    try {
-      const response = await axios.get(`${API_URL}/chat/messages/user_chat/`, {
-        params: { user1: user.id, user2: receiverId },
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      setMessages(response.data);
-      scrollToBottom();
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    }
-  };
+const fetchMessages = async () => {
+  if (!user) return;
+  try {
+    const response = await axios.get(`${API_URL}/chat/messages/user_chat/`, {
+      params: { user1: user.id, user2: receiverId },
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    setMessages(response.data);
+    scrollToBottom();
+
+    // Mark all messages as read
+    await axios.post(
+      `${API_URL}/chat/messages/mark_as_read/`,
+      { user1: user.id, user2: receiverId },
+      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+    );
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+  }
+};
+
 
   // Send message
   const sendMessage = async (e) => {
@@ -189,6 +197,22 @@ const ChatRoom = () => {
               <Button type="submit" className="btn-send rounded-pill">
                 Send
               </Button>
+              <Button
+  variant="danger"
+  className="ms-2 rounded-pill"
+  onClick={async () => {
+    if (window.confirm("Delete this chat permanently?")) {
+      await axios.delete(`${API_URL}/chat/messages/delete_chat/`, {
+        data: { user1: user.id, user2: receiverId },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setMessages([]);
+    }
+  }}
+>
+  🗑️
+</Button>
+
             </Form>
             {attachment && <small className="text-muted mt-1 d-block">Selected: {attachment.name}</small>}
           </Card.Footer>
