@@ -2,7 +2,6 @@ amqp==5.2.0
 asgiref==3.8.1
 billiard==4.2.0
 blinker==1.9.0
-buildozer==1.5.0
 celery==5.4.0
 certifi==2025.1.31
 charset-normalizer==3.4.1
@@ -26,12 +25,6 @@ idna==3.10
 imutils==0.5.4
 itsdangerous==2.2.0
 Jinja2==3.1.6
-Kivy==2.3.1
-kivy-deps.angle==0.4.0
-kivy-deps.glew==0.3.1
-Kivy-Garden==0.1.5
-kivy_deps.sdl2==0.8.0
-kivymd==1.2.0
 kombu==5.3.7
 MarkupSafe==3.0.2
 mysqlclient==2.2.4
@@ -43,11 +36,8 @@ pillow==10.4.0
 platformdirs==4.3.6
 prompt_toolkit==3.0.47
 ptyprocess==0.7.0
-pygame==2.6.1
 Pygments==2.19.1
-pypiwin32==223
 python-dateutil==2.9.0.post0
-pywin32==308
 redis==5.0.7
 requests==2.32.3
 scipy==1.15.1
