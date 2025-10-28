@@ -151,6 +151,7 @@ AUTH_USER_MODEL = 'users.User'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://looplearn-10.onrender.com",
+    "https://looplearn123.netlify.app",
 ]
 
 
