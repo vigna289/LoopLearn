@@ -9,4 +9,4 @@
 /Backend/Registration/migrations
 /Backend/users/__pycache__
 /Backend/users/migrations
-/Backend/db.sqlite3
+# /Backend/db.sqlite3
