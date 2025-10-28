@@ -1,1 +1,1 @@
-web: gunicorn backend.wsgi --chdir backend
+gunicorn backend.myproject.wsgi --chdir backend
