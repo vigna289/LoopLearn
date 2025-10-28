@@ -179,31 +179,36 @@ function Login() {
     <>
       <CustomNavbar className="fixed-top" />
       <div
-        className="d-flex justify-content-center align-items-center"
-        style={{
-          minHeight: "calc(100vh - 150px)",
-          paddingTop: "80px",
-          paddingBottom: "50px",
-          padding: "15px",
-          background: "linear-gradient(120deg, #fdfbfb, #ebedee)",
-        }}
-      >
+  className="d-flex flex-column flex-md-row justify-content-center align-items-center"
+  style={{
+    minHeight: "calc(100vh - 150px)",
+    paddingTop: "80px",
+    paddingBottom: "50px",
+    padding: "15px",
+    background: "linear-gradient(120deg, #fdfbfb, #ebedee)",
+  }}
+>
+
         {/* Left side - Minions */}
-        <div className="d-flex justify-content-end" style={{ marginRight: "-40px" }}>
-          <MinionMotion isTyping={isTyping} />
-        </div>
+        <div
+  className="d-flex justify-content-center justify-content-md-end mb-4 mb-md-0"
+  style={{ marginRight: "0" }}
+>
+  <MinionMotion isTyping={isTyping} />
+</div>
+
 
         {/* Login Form */}
         <div
-          className="card p-4 shadow-lg"
-          style={{
-            maxWidth: "600px",
-            width: "100%",
-            borderRadius: "15px",
-            boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
-            marginLeft: "-40px",
-          }}
-        >
+  className="card p-4 shadow-lg w-100"
+  style={{
+    maxWidth: "400px",
+    borderRadius: "15px",
+    boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+    margin: "0 10px",
+  }}
+>
+
           <h2 className="mb-4 text-center">Login</h2>
           {showAlert && (
             <Alert
