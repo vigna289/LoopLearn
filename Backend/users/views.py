@@ -26,6 +26,8 @@ class UserCreateView(generics.CreateAPIView):
         user.otp_code = otp
         user.otp_expiry = timezone.now() + timedelta(seconds=150)
         user.save()
+        print("Generated OTP for", user.email, "is", otp)
+
 
         # Send OTP via email (or any other method)
         send_mail(
