@@ -4,6 +4,8 @@ import CustomNavbar from "../shared/Navbar";
 import RecentForumCards from "./recentForumCard";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
+import AiAssistant from "./AiAssistant";
+
 
 const Dashboard = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -15,17 +17,51 @@ const Dashboard = () => {
   const [forumPostsList, setForumPostsList] = useState([]);
   const [skillsOptions, setSkillsOptions] = useState([]);
   const [statesOptions, setStatesOptions] = useState([]);
+  const [matchedUsers, setMatchedUsers] = useState([]);
+
 
   const skillsRef = useRef(null);
   const locationsRef = useRef(null);
   const forumRef = useRef(null);
   const navigate = useNavigate();
 
+useEffect(() => {
+  const fetchMatchedUsers = async () => {
+    try {
+      const loggedInUser = JSON.parse(localStorage.getItem("user"));
+      if (!loggedInUser?.email) return;
+
+      const url = `${API_URL}/api/Registration/skill-match/?email=${encodeURIComponent(loggedInUser.email)}`;
+      const response = await axios.get(url);
+
+      // Normalize emails just in case
+      const localEmail = loggedInUser.email.trim().toLowerCase();
+
+      const matchedUsers = response.data.map(user => ({
+        ...user,
+        email: user.email.trim().toLowerCase(),
+      }));
+
+      // Optional: filter again to be safe
+      const filteredMatches = matchedUsers.filter(user => user.email !== localEmail);
+
+      setMatchedUsers(filteredMatches);
+
+    } catch (err) {
+      console.error("Error fetching matched users:", err);
+    }
+  };
+
+  fetchMatchedUsers();
+}, []);
+
+
   useEffect(() => {
     const fetchData = async () => {
       const loggedInUser = JSON.parse(localStorage.getItem("user"));
       try {
         const response = await axios.get(`${API_URL}/api/Registration/users/`);
+        console.log("Vigna",response)
         const data = response.data;
         const skillsSet = new Set();
         const statesSet = new Set();
@@ -297,9 +333,32 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+{/* <div className="container mt-5 p-4" style={{ borderRadius: "10px", background: "#f9f9f9" }}>
+  <h2>Suggested Users Based on Your Skills</h2>
+  {matchedUsers.length === 0 && <p>No matches found yet.</p>}
+  <div className="row">
+    {matchedUsers.map((user) => (
+      <div className="col-md-4 mb-3" key={user.id}>
+        <div className="card">
+          <img
+            src={user.profile_picture || "https://tse4.mm.bing.net/th/id/OIP.Yaficbwe3N2MjD2Sg0J9OgHaHa?pid=Api&P=0&h=180"}
+            className="card-img-top"
+            alt={user.full_name}
+          />
+          <div className="card-body">
+            <h5 className="card-title">{user.full_name}</h5>
+            <p className="card-text">Email: {user.email}</p>
+            <p className="card-text">Skills: {user.skills.join(", ")}</p>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div> */}
 
       {/* Forum Cards */}
       <RecentForumCards forumPosts={forumPostsList} />
+      <AiAssistant />
     </>
   );
 };

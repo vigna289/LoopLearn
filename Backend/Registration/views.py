@@ -6,7 +6,28 @@ from Registration.models import User
 from Registration.serializers import UserSerializer
 from rest_framework import generics
 
+class SkillMatchView(APIView):
+    def get(self, request):
+        email = request.query_params.get('email')
+        if not email:
+            return Response({'error': 'Email query param is required'}, status=400)
 
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+
+        user_skills = user.skills.all()
+        desired_skills = user.desired_skills.all()
+
+        # Find users who have skills matching current user's desired skills
+        matching_users = User.objects.filter(
+            skills__in=desired_skills
+        ).exclude(email=email).distinct()
+
+        serializer = UserSerializer(matching_users, many=True)
+        return Response(serializer.data, status=200)
+    
 class UserSignupView(APIView):
     def post(self, request):
         # Use request.data for text fields and request.FILES for file uploads

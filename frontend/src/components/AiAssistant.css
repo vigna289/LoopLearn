@@ -1,0 +1,57 @@
+.ai-fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: #6a38c2;
+  color: white;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.ai-modal {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 320px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  z-index: 1001;
+}
+
+.ai-header {
+  background: #6a38c2;
+  color: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ai-body {
+  padding: 10px;
+}
+
+.ai-body input {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.ai-body button {
+  width: 100%;
+  background: #6a38c2;
+  color: white;
+  border: none;
+  padding: 6px;
+}
+
+.ai-answer {
+  margin-top: 10px;
+  font-size: 14px;
+}
