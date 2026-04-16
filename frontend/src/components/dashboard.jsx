@@ -31,16 +31,15 @@ useEffect(() => {
       const loggedInUser = JSON.parse(localStorage.getItem("user"));
       if (!loggedInUser?.email) return;
 
-      const url = `${API_URL}/api/Registration/skill-match/?email=${encodeURIComponent(loggedInUser.email)}`;
-      const response = await axios.get(url);
+      const url = `${API_URL}/api/ai/recommend/`;
+      const response = await axios.post(url, { user_id: loggedInUser.id });
 
       // Normalize emails just in case
       const localEmail = loggedInUser.email.trim().toLowerCase();
 
-      const matchedUsers = response.data.map(user => ({
-        ...user,
-        email: user.email.trim().toLowerCase(),
-      }));
+      const matchedUsers = response.data.recommendations || [];
+setMatchedUsers(matchedUsers);
+
 
       // Optional: filter again to be safe
       const filteredMatches = matchedUsers.filter(user => user.email !== localEmail);
@@ -90,20 +89,18 @@ useEffect(() => {
             skillsSet.add(user.skills);
             statesSet.add(user.state);
 
-            return {
-              id: user.id,
-              full_name: user.full_name,
-              name: user.full_name,
-              location: `${user.city}, ${user.state}`,
-              email: user.email,
-              skills: user.skills ? user.skills.split(", ") : [],
-              desiredSkills: user.desired_skills ? user.desired_skills.split(", ") : [],
-              qualification: user.qualification || "N/A",
-              year_of_experience: user.year_of_experience || 0,
-              rating: averageScore.toFixed(2) || "N/A",
-              img: profilePicture,
-              message: `Looking to exchange ${user.skills} skills for ${user.desired_skills} knowledge.`,
-            };
+           return {
+  id: user.id,
+  full_name: user.full_name,
+  city: user.city,
+  state: user.state,
+  location: `${user.city}, ${user.state}`,
+  email: user.email,
+  skills: user.skills ? user.skills.split(", ") : [],
+  desired_skills: user.desired_skills ? user.desired_skills.split(", ") : [],
+  qualification: user.qualification || "N/A",
+  year_of_experience: user.year_of_experience || 0,
+};
           })
         );
 
@@ -140,12 +137,16 @@ useEffect(() => {
     });
   };
 
-  const handleSearchByLocation = () => {
-    if (!selectedLocation) return;
-    navigate("/location-profile-view", {
-      state: { searchType: "location", searchTerm: selectedLocation },
-    });
-  };
+ const handleSearchByLocation = () => {
+  if (!selectedLocation) return;
+  navigate("/location-profile-view", {
+    state: { 
+      searchType: "location", 
+      searchTerm: selectedLocation,
+      profiles: forumPostsList   // ✅ ADD THIS
+    },
+  });
+};
 
   return (
     <>
@@ -333,12 +334,12 @@ useEffect(() => {
           </div>
         )}
       </div>
-{/* <div className="container mt-5 p-4" style={{ borderRadius: "10px", background: "#f9f9f9" }}>
+<div className="container mt-5 p-4" style={{ borderRadius: "10px", background: "#f9f9f9" }}>
   <h2>Suggested Users Based on Your Skills</h2>
   {matchedUsers.length === 0 && <p>No matches found yet.</p>}
   <div className="row">
     {matchedUsers.map((user) => (
-      <div className="col-md-4 mb-3" key={user.id}>
+      <div className="col-md-4 mb-3" key={user.email}>
         <div className="card">
           <img
             src={user.profile_picture || "https://tse4.mm.bing.net/th/id/OIP.Yaficbwe3N2MjD2Sg0J9OgHaHa?pid=Api&P=0&h=180"}
@@ -348,13 +349,16 @@ useEffect(() => {
           <div className="card-body">
             <h5 className="card-title">{user.full_name}</h5>
             <p className="card-text">Email: {user.email}</p>
-            <p className="card-text">Skills: {user.skills.join(", ")}</p>
+            <p className="card-text">Skills: {user.skills}</p>
+            <p className="card-text">Desired Skills: {user.desired_skills}</p>
+            <p className="card-text">Similarity: {user.similarity}</p>
           </div>
         </div>
       </div>
     ))}
   </div>
-</div> */}
+</div>
+
 
       {/* Forum Cards */}
       <RecentForumCards forumPosts={forumPostsList} />

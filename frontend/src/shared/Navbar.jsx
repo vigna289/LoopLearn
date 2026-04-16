@@ -41,7 +41,9 @@ const CustomNavbar = () => {
             : "https://tse4.mm.bing.net/th/id/OIP.Yaficbwe3N2MjD2Sg0J9OgHaHa?pid=Api&P=0&h=180";
         setProfilePicture(pictureUrl);
 
-        fetchNotifications(parsedUser.id);
+       if (parsedUser?.id) {
+  fetchNotifications(parsedUser.id);
+}
         fetchUnreadChatCount(); // ✅ fetch chat unread count
       } else {
         setIsLoggedIn(false);
@@ -65,6 +67,7 @@ const CustomNavbar = () => {
 
   // ✅ Fetch notifications
   const fetchNotifications = async (userId) => {
+     if (!userId) return;  // ✅ ADD THIS LINE
     try {
       const response = await axios.get(
         `${API_URL}/api/friends/notifications/${userId}/`

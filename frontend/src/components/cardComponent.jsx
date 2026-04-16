@@ -82,14 +82,15 @@ const desiredSkills = Array.isArray(profile.desired_skills)
         >
           {profile.full_name}
         </Card.Title>
-        <Card.Text>
-          <strong>Location:</strong> {profile.state}
-        </Card.Text>
-        <Card.Text>
-          <strong>Skills:</strong> {skills.join(", ")}
-        </Card.Text>
-        <Card.Text>
-  <strong>Desired Skills:</strong> {desiredSkills.join(", ")}
+      <strong>Location:</strong> {profile.city || "N/A"}
+
+<Card.Text>
+  <strong>Skills:</strong> {skills.join(", ")}
+</Card.Text>
+
+<Card.Text>
+  <strong>Desired Skills:</strong>{" "}
+  {desiredSkills.length > 0 ? desiredSkills.join(", ") : "Not specified"}
 </Card.Text>
         <Card.Text>
           <strong>Qualification:</strong> {profile.qualification}
