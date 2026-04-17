@@ -213,9 +213,9 @@ const FullProfileView = () => {
     : profile.desired_skills || "N/A"}
 </Card.Text>
 
-              <Card.Text>
+              {/* <Card.Text>
                 <strong>Rating:</strong> {profile.rating}
-              </Card.Text>
+              </Card.Text> */}
               {hasPendingRequest ? (
                 <Button
                   variant="primary"

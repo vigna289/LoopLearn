@@ -19,6 +19,7 @@ const ChatPage = () => {
 
 const fetchPartners = async () => {
   if (!user) return;
+
   try {
     const [partnersRes, unreadRes] = await Promise.all([
       axios.get(`${API_URL}/chat/messages/user_chats/`, {
@@ -32,10 +33,35 @@ const fetchPartners = async () => {
     ]);
 
     const unreadCounts = unreadRes.data;
-    const updatedPartners = partnersRes.data.map((p) => ({
-      ...p,
-      unread_count: unreadCounts[p.id] || 0,
-    }));
+
+    // 🔥 ADD THIS PART
+    const updatedPartners = await Promise.all(
+      partnersRes.data.map(async (p) => {
+        try {
+          const emailEncoded = encodeURIComponent(p.email);
+
+          const res = await fetch(
+            `${API_URL}/api/users/profile-picture/${emailEncoded}/`
+          );
+
+          const data = await res.json();
+
+          return {
+            ...p,
+            profile_picture: data.profile_picture
+              ? `${API_URL}${data.profile_picture}`
+              : null,
+            unread_count: unreadCounts[p.id] || 0,
+          };
+        } catch {
+          return {
+            ...p,
+            profile_picture: null,
+            unread_count: unreadCounts[p.id] || 0,
+          };
+        }
+      })
+    );
 
     setPartners(updatedPartners);
   } catch (error) {
@@ -66,10 +92,14 @@ const fetchPartners = async () => {
                 onClick={() => navigate(`/chat/${partner.id}`)}
               >
                 <Image
-                  src={partner.profile_pic || "https://via.placeholder.com/50"}
-                  roundedCircle
-                  className="me-3 chat-avatar"
-                />
+  src={
+    partner.profile_picture
+      ? partner.profile_picture
+      : `https://ui-avatars.com/api/?name=${partner.full_name}&background=6A38C2&color=fff`
+  }
+  roundedCircle
+  className="me-3 chat-avatar"
+/>
                 <div className="chat-info">
                   <div className="chat-name">{partner.full_name || partner.email}</div>
                   {partner.unread_count > 0 && (

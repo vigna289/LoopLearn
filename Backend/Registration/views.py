@@ -17,21 +17,53 @@ class SkillMatchView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=404)
 
-        user_skills = user.skills.all()
-        desired_skills = user.desired_skills.all()
+        # ✅ Normalize + split properly
+        def clean_skills(skill_string):
+            if not skill_string:
+                return []
+            return [s.strip().lower() for s in skill_string.split(',') if s.strip()]
 
-        # Find users who have skills matching current user's desired skills
-        matching_users = User.objects.filter(
-            skills__in=desired_skills
-        ).exclude(email=email).distinct()
+        user_skills = clean_skills(user.skills)
+        desired_skills = clean_skills(user.desired_skills)
 
-        serializer = UserSerializer(matching_users, many=True)
-        return Response(serializer.data, status=200)
+        all_users = User.objects.exclude(email=email)
+
+        result = []
+
+        for u in all_users:
+            other_skills = clean_skills(u.skills)
+
+            # ✅ Find matches
+            matched = set(desired_skills).intersection(set(other_skills))
+
+            # ✅ Similarity score
+            similarity = 0
+            if desired_skills:
+                similarity = round((len(matched) / len(desired_skills)) * 100, 2)
+
+            # ❗ Only include if at least 1 match
+            if matched:
+                result.append({
+                    "id": u.id,
+                    "full_name": u.full_name,
+                    "email": u.email,
+                    "skills": u.skills,
+                    "desired_skills": u.desired_skills,
+                    "similarity": similarity,
+                    "matched_skills": list(matched),
+                    "profile_picture": u.profile_picture.url if u.profile_picture else None
+                })
+
+        # ✅ Sort by similarity (best first)
+        result = sorted(result, key=lambda x: x["similarity"], reverse=True)
+
+        return Response(result, status=200)
+
     
 class UserSignupView(APIView):
     def post(self, request):
         # Use request.data for text fields and request.FILES for file uploads
-        data = request.data.copy()
+        data = request.data
         files = request.FILES
 
         # Add files to data if they exist

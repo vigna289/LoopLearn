@@ -31,20 +31,17 @@ useEffect(() => {
       const loggedInUser = JSON.parse(localStorage.getItem("user"));
       if (!loggedInUser?.email) return;
 
-      const url = `${API_URL}/api/ai/recommend/`;
-      const response = await axios.post(url, { user_id: loggedInUser.id });
+      const email = loggedInUser.email;
 
-      // Normalize emails just in case
-      const localEmail = loggedInUser.email.trim().toLowerCase();
+      console.log("EMAIL:", email);
 
-      const matchedUsers = response.data.recommendations || [];
-setMatchedUsers(matchedUsers);
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/Registration/skill-match/?email=${email}`
+      );
 
+      console.log("MATCH DATA:", response.data);
 
-      // Optional: filter again to be safe
-      const filteredMatches = matchedUsers.filter(user => user.email !== localEmail);
-
-      setMatchedUsers(filteredMatches);
+      setMatchedUsers(response.data);
 
     } catch (err) {
       console.error("Error fetching matched users:", err);
@@ -100,6 +97,7 @@ setMatchedUsers(matchedUsers);
   desired_skills: user.desired_skills ? user.desired_skills.split(", ") : [],
   qualification: user.qualification || "N/A",
   year_of_experience: user.year_of_experience || 0,
+  profile_picture: profilePicture   // ✅ ADD THIS
 };
           })
         );
@@ -339,6 +337,7 @@ setMatchedUsers(matchedUsers);
   {matchedUsers.length === 0 && <p>No matches found yet.</p>}
   <div className="row">
     {matchedUsers.map((user) => (
+      
       <div className="col-md-4 mb-3" key={user.email}>
         <div className="card">
           <img
@@ -349,9 +348,26 @@ setMatchedUsers(matchedUsers);
           <div className="card-body">
             <h5 className="card-title">{user.full_name}</h5>
             <p className="card-text">Email: {user.email}</p>
-            <p className="card-text">Skills: {user.skills}</p>
-            <p className="card-text">Desired Skills: {user.desired_skills}</p>
-            <p className="card-text">Similarity: {user.similarity}</p>
+            <p className="card-text">
+  Skills: {Array.isArray(user.skills) ? user.skills.join(", ") : user.skills}
+</p>
+
+<p className="card-text">
+  Desired Skills: {Array.isArray(user.desired_skills) 
+    ? user.desired_skills.join(", ") 
+    : user.desired_skills}
+</p>
+
+<p className="card-text">
+  Similarity: <strong>{user.similarity ?? 0}%</strong>
+</p>
+
+<p className="card-text">
+  Matched Skills: {user.matched_skills?.length 
+    ? user.matched_skills.join(", ") 
+    : "None"}
+</p>
+
           </div>
         </div>
       </div>

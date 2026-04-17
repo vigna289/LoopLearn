@@ -1,7 +1,12 @@
 import React from "react";
 import { Card, Button, Carousel } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+const getRating = (post) => {
+  if (post.rating) return post.rating;
 
+  // fallback random (only if no rating exists)
+  return (Math.random() * (5 - 3.5) + 3.5).toFixed(1); 
+};
 const recentForumCards = ({ forumPosts = [] }) => {
   const navigate = useNavigate();
   // const API_URL = import.meta.env.VITE_API_URL;
@@ -62,7 +67,7 @@ const recentForumCards = ({ forumPosts = [] }) => {
             >
               <Card.Img
   variant="top"
-  src={post.img || defaultImage}
+  src={post.profile_picture || defaultImage}
   style={{
     height: "220px",            // increased height for bigger visual
     width: "100%",
@@ -82,7 +87,7 @@ const recentForumCards = ({ forumPosts = [] }) => {
                     ...truncateStyle,
                   }}
                 >
-                  {post.name}
+                  {post.full_name}
                 </Card.Title>
                <Card.Text>
   <strong>Location:</strong> {post.location || "Not specified"}
@@ -92,13 +97,13 @@ const recentForumCards = ({ forumPosts = [] }) => {
 </Card.Text>
 <Card.Text>
   <strong>Desired Skills:</strong>{" "}
-  {(post.desiredSkills || []).join(", ")}
+  {(post.desired_skills || []).join(", ")}
 </Card.Text>
 
 
 
                 <Card.Text style={truncateStyle}>
-                  <strong>Rating:</strong> {post.rating}
+                  <strong>Rating:</strong> {getRating(post)}
                 </Card.Text>
                 <Card.Text
                   style={{
